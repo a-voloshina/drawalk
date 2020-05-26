@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">DraWalk Application</string>
+    <string name="cancell_next">Calc, cancell next</string>
+    <string name="simple">Calc (simple)</string>
+    <string name="calc_placeholder">Calculation result</string>
+</resources>

@@ -1,0 +1,2 @@
+rootProject.name='DraWalk Application'
+include ':app'
