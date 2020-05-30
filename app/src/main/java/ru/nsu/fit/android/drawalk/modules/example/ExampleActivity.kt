@@ -1,9 +1,10 @@
 package ru.nsu.fit.android.drawalk.modules.example
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import ru.nsu.ccfit.molochev.android.rssample.modules.base.SingleFragmentActivity
 import ru.nsu.fit.android.drawalk.databinding.ActivityExampleBinding
+import ru.nsu.fit.android.drawalk.modules.feed.FeedActivity
 
 class ExampleActivity: SingleFragmentActivity() {
     private var counter = 0
@@ -26,6 +27,9 @@ class ExampleActivity: SingleFragmentActivity() {
         }
         binding.repeateble.setOnClickListener {
             presenter.calcWithoutCancel(counter++.toString())
+        }
+        binding.feed.setOnClickListener {
+            startActivity(Intent(this, FeedActivity::class.java))
         }
     }
 }

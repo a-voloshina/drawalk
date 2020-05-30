@@ -3,4 +3,8 @@
     <string name="cancell_next">Calc, cancell next</string>
     <string name="simple">Calc (simple)</string>
     <string name="calc_placeholder">Calculation result</string>
+    <string name="to_feed">To Feed</string>
+    <string name="id_placeholder">ID</string>
+    <string name="author_id_placeholder">Author ID</string>
+    <string name="art_miniature_description">Art miniature</string>
 </resources>
