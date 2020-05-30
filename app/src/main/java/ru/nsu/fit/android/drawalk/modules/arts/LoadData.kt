@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.modules.feed
+package ru.nsu.fit.android.drawalk.modules.arts
 
 import kotlinx.coroutines.delay
 import ru.nsu.fit.android.drawalk.common.UseCase

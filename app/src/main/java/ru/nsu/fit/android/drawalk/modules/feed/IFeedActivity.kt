@@ -1,9 +1,9 @@
 package ru.nsu.fit.android.drawalk.modules.feed
 
-import ru.nsu.fit.android.drawalk.model.GpsArt
 import ru.nsu.fit.android.drawalk.modules.base.IViewActivity
 
-abstract class IFeedActivity: IViewActivity<IFeedPresenter>() {
+abstract class IFeedActivity<T: Any>: IViewActivity<IFeedPresenter>() {
     abstract fun startLoading()
-    abstract fun updateFeed(newData: List<GpsArt>)
+    abstract fun updateFeed(newData: List<T>)
+    abstract fun showError(cause: Throwable)
 }

@@ -1,36 +1,28 @@
 package ru.nsu.fit.android.drawalk.modules.feed
 
 import android.os.Bundle
-import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.components.autoloading.AutoLoadingRecyclerAdapter
 import ru.nsu.fit.android.drawalk.components.autoloading.OnLoadMoreListener
-import ru.nsu.fit.android.drawalk.databinding.ActivityListBinding
-import ru.nsu.fit.android.drawalk.databinding.ItemArtBinding
-import ru.nsu.fit.android.drawalk.model.GpsArt
 
-class FeedActivity : IFeedActivity() {
-    private val data = mutableListOf<GpsArt?>()
-    private lateinit var adapter: FeedAdapter
-    private lateinit var binding: ActivityListBinding
+abstract class FeedActivity<T: Any> : IFeedActivity<T>() {
+    protected val data = mutableListOf<T?>()
+    protected lateinit var adapter: AutoLoadingRecyclerAdapter<T, RecyclerView.ViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityListBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_list)
 
-        presenter = FeedPresenter(this)
-
-        binding.recyclerView.also {
+        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        recyclerView.also {
             it.layoutManager = LinearLayoutManager(this)
-            adapter = FeedAdapter(
+            adapter = provideAdapter(
                 it,
                 data
-            )
-                .also { adapter ->
+            ).also { adapter ->
                     adapter.loadMoreListener = object : OnLoadMoreListener {
                         override fun onLoadMore() {
                             presenter.loadMoreData()
@@ -47,7 +39,7 @@ class FeedActivity : IFeedActivity() {
         adapter.notifyItemInserted(data.lastIndex)
     }
 
-    override fun updateFeed(newData: List<GpsArt>) {
+    override fun updateFeed(newData: List<T>) {
         val index = data.lastIndex
         data.removeAt(index)
         adapter.notifyItemRemoved(index)
@@ -56,25 +48,6 @@ class FeedActivity : IFeedActivity() {
         adapter.setLoaded()
     }
 
+    protected abstract fun provideAdapter(view: RecyclerView, data: List<T?>): AutoLoadingRecyclerAdapter<T, RecyclerView.ViewHolder>
 
-    class FeedAdapter(recyclerView: RecyclerView, data: List<GpsArt?>) :
-        AutoLoadingRecyclerAdapter<GpsArt, FeedAdapter.FeedViewHolder>(recyclerView, data) {
-        class FeedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            var binding = ItemArtBinding.bind(view)
-        }
-
-        override val dataItemLayoutId = R.layout.item_art
-
-        override fun isItemViewHolder(holder: RecyclerView.ViewHolder) = holder is FeedViewHolder
-
-        override fun provideItemViewHolder(view: View) = FeedViewHolder(view)
-
-        override fun bindDataViewHolder(holder: RecyclerView.ViewHolder, item: GpsArt) {
-            val exampleViewHolder = holder as? FeedViewHolder
-                ?: throw RuntimeException("Wrong holder type")
-            val binding = exampleViewHolder.binding
-            binding.txtId.text = item.id
-            binding.txtAuthorId.text = item.authorId
-        }
-    }
 }

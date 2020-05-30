@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import ru.nsu.ccfit.molochev.android.rssample.modules.base.SingleFragmentActivity
 import ru.nsu.fit.android.drawalk.databinding.ActivityExampleBinding
-import ru.nsu.fit.android.drawalk.modules.feed.FeedActivity
+import ru.nsu.fit.android.drawalk.modules.arts.ArtsFeedActivity
 
 class ExampleActivity: SingleFragmentActivity() {
     private var counter = 0
@@ -29,7 +29,7 @@ class ExampleActivity: SingleFragmentActivity() {
             presenter.calcWithoutCancel(counter++.toString())
         }
         binding.feed.setOnClickListener {
-            startActivity(Intent(this, FeedActivity::class.java))
+            startActivity(Intent(this, ArtsFeedActivity::class.java))
         }
     }
 }

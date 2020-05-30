@@ -1,17 +1,29 @@
 package ru.nsu.fit.android.drawalk.modules.feed
 
-class FeedPresenter(
-    private val view: IFeedActivity,
-    pageSize: Int = 10
+import ru.nsu.fit.android.drawalk.common.UseCase
+
+abstract class FeedPresenter<T: Any>(
+    private val view: IFeedActivity<T>
 ) : IFeedPresenter {
-    private val loadData = LoadData(pageSize)
+    protected  abstract val loadUseCase: UseCase<Int, List<T>>
     private var loading = false
 
-    override fun loadMoreData() {
-        load()
+    protected fun initCallbacks() {
+        loadUseCase.onComplete {
+            loading = false
+            view.updateFeed(it)
+        }.onError {
+            loading = false
+            view.showError(it)
+        }
     }
 
     override fun start() {
+        initCallbacks()
+        load()
+    }
+
+    override fun loadMoreData() {
         load()
     }
 
@@ -19,10 +31,7 @@ class FeedPresenter(
         if (!loading) {
             loading = true
             view.startLoading()
-            loadData.onComplete {
-                loading = false
-                view.updateFeed(it)
-            }.execute()
+            loadUseCase.execute()
         }
     }
 }
