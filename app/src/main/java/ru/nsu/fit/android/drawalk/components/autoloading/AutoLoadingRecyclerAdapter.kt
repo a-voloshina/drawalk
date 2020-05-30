@@ -48,11 +48,11 @@ abstract class AutoLoadingRecyclerAdapter<T : Any, VH : ViewHolder>(
                 totalItemCount = linearLayoutManager.itemCount
                 lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition()
                 if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                    isLoading = true
                     if (!adapter::loadMoreListener.isInitialized) {
                         throw RuntimeException("No load listener")
                     }
                     loadMoreListener.onLoadMore()
-                    isLoading = true
                 }
             }
         })

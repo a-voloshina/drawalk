@@ -6,19 +6,17 @@ import ru.nsu.fit.android.drawalk.model.GpsArt
 import java.security.SecureRandom
 
 
-class LoadData(request: LoadRequest): UseCase<LoadData.LoadRequest, Unit>(request) {
+class LoadData(request: Int): UseCase<Int, List<GpsArt>>(request) {
     private val random = SecureRandom()
 
-    override suspend fun executeOnBackground() {
-        val data = request.data
-        data.removeAt(data.lastIndex)   //removes "loading" null
-        val index: Int = data.size
-        val end = index + request.pageSize
-        for (i in index until end) {
+    override suspend fun executeOnBackground(): List<GpsArt> {
+        val out = mutableListOf<GpsArt>()
+        for (i in 0 until request) {
             delay(500) //simulates working
             val contact = GpsArt(genId(), genId(), mutableListOf())
-            data.add(contact)
+            out.add(contact)
         }
+        return out
     }
 
     private fun genId(): String {
@@ -27,9 +25,4 @@ class LoadData(request: LoadRequest): UseCase<LoadData.LoadRequest, Unit>(reques
         val randomNumber = random.nextInt(high - low) + low
         return "0$randomNumber"
     }
-
-    data class LoadRequest(
-        val data: MutableList<GpsArt?>,
-        val pageSize: Int
-    )
 }

@@ -22,7 +22,7 @@ class FeedActivity : IFeedActivity() {
         binding = ActivityListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        presenter = FeedPresenter(this, data, 2)
+        presenter = FeedPresenter(this)
 
         binding.recyclerView.also {
             it.layoutManager = LinearLayoutManager(this)
@@ -44,11 +44,15 @@ class FeedActivity : IFeedActivity() {
 
     override fun startLoading() {
         data.add(null)
-        adapter.notifyDataSetChanged()
+        adapter.notifyItemInserted(data.lastIndex)
     }
 
-    override fun updateFeed(start: Int, count: Int) {
-        adapter.notifyItemRangeInserted(start, count)
+    override fun updateFeed(newData: List<GpsArt>) {
+        val index = data.lastIndex
+        data.removeAt(index)
+        adapter.notifyItemRemoved(index)
+        data.addAll(newData)
+        adapter.notifyItemRangeInserted(index, newData.size)
         adapter.setLoaded()
     }
 
