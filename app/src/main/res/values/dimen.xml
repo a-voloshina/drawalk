@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="med_fab_margin">16dp</dimen>
+    <dimen name="mini_fab_margin">10dp</dimen>
+</resources>

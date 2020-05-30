@@ -1,4 +1,4 @@
-package ru.nsu.ccfit.molochev.android.rssample.modules.base
+package ru.nsu.fit.android.drawalk.modules.base
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

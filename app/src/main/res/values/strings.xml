@@ -3,4 +3,14 @@
     <string name="cancell_next">Calc, cancell next</string>
     <string name="simple">Calc (simple)</string>
     <string name="calc_placeholder">Calculation result</string>
+    <string name="allow">Разрешить</string>
+    <string name="decline">Отклонить</string>
+    <string name="explanation_dialog_title">Доступ к данным</string>
+    <string name="explanation_dialog_message">Чтобы продолжить необходимо разрешение на получение информации о местоположении.
+        Это разрешение требуется для того,
+        чтобы рисовать маршрут на основе вашей геолокации. Разрешить доступ к данным? </string>
+    <string name="really_need_explanation_dialog_message">Чтобы продолжить необходимо разрешение на получение информации о местоположении.
+        Это разрешение требуется для того,
+        чтобы рисовать маршрут на основе вашей геолокации. Разрешить доступ к данным? </string>
+    <string name="permission_denied">Отказано в разрешении</string>
 </resources>

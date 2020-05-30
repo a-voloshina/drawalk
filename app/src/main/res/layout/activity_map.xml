@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+    <LinearLayout
+        android:gravity="center_horizontal"
+        android:layout_gravity="bottom|end"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/play_pause_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/mini_fab_margin"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_play"
+            android:tint="@color/grey_80"
+            app:backgroundTint="@color/grey_20"
+            app:fabSize="mini"
+            app:rippleColor="@color/white"
+            />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/stop_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/mini_fab_margin"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_stop"
+            android:tint="@color/grey_80"
+            app:backgroundTint="@color/grey_20"
+            app:fabSize="mini"
+            app:rippleColor="@color/white"
+            />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/cancel_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/mini_fab_margin"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_cancel"
+            android:tint="@color/grey_80"
+            app:backgroundTint="@color/grey_20"
+            app:fabSize="mini"
+            app:rippleColor="@color/white"
+            />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/map_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginLeft="@dimen/med_fab_margin"
+            android:layout_marginTop="@dimen/mini_fab_margin"
+            android:layout_marginRight="@dimen/med_fab_margin"
+            android:layout_marginBottom="@dimen/med_fab_margin"
+            android:src="@drawable/ic_settings"
+            app:fabSize="normal" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
