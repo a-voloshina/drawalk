@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.IntentSender
 import android.graphics.Color
+import android.location.Location
 import android.os.Bundle
 import android.os.Looper
 import android.view.LayoutInflater
@@ -21,6 +22,7 @@ import com.google.android.gms.tasks.Task
 
 import ru.nsu.fit.android.drawalk.R
 import java.lang.Exception
+
 class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     companion object {
@@ -33,7 +35,7 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
     private lateinit var startPoint: LatLng
     private lateinit var locationCallback: LocationCallback
 
-    private lateinit var  myActivity: Activity
+    private lateinit var myActivity: Activity
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -138,13 +140,19 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
         map.setOnMyLocationClickListener { location ->
             showToast("Current location: $location")
         }
+        val locationRequest = createLocationRequest()
+        if(locationRequest == null){
+            showToast("get null locationRequest") //TODO: dialog?
+        } else {
+            startLocationUpdates(locationRequest)
+        }
     }
 
     override fun handleFail() {
         showSadMessage()
     }
 
-    fun createLocationRequest(): LocationRequest? {
+    private fun createLocationRequest(): LocationRequest? {
         return LocationRequest.create()?.apply {
             interval = 10000    //location updates rate in milliseconds
             fastestInterval = 5000  //location updates fastest rate in milliseconds
@@ -152,29 +160,56 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
         }
     }
 
-    fun getCurrentLocationSettings(locationRequest: LocationRequest) {
+    private fun startLocationUpdates(locationRequest: LocationRequest) {
         val builder = LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest)
-
         val locationSettingsRequest = builder.build()
+
         val client: SettingsClient = LocationServices.getSettingsClient(myActivity)
         client.checkLocationSettings(locationSettingsRequest)
 
-        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
-        task.addOnSuccessListener { locationSettingsResponse ->
-
-        }
-        task.addOnFailureListener { exception ->
-            if (exception is ResolvableApiException) {
-                try {
-                    exception.startResolutionForResult(
-                        myActivity,
-                        REQUEST_CHECK_SETTINGS
-                    )
-                } catch (sendEx: IntentSender.SendIntentException) {
-                    // Ignore the error.
+        LocationServices.getFusedLocationProviderClient(myActivity)
+            .requestLocationUpdates(locationRequest, object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    onLocationChanged(locationResult.lastLocation)
                 }
-            }
+            }, Looper.myLooper())
+
+//        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
+//        task.addOnSuccessListener { locationSettingsResponse ->
+//
+//        }
+//        task.addOnFailureListener { exception ->
+//            if (exception is ResolvableApiException) {
+//                try {
+//                    exception.startResolutionForResult(
+//                        myActivity,
+//                        REQUEST_CHECK_SETTINGS
+//                    )
+//                } catch (sendEx: IntentSender.SendIntentException) {
+//                    // Ignore the error.
+//                }
+//            }
+//        }
+    }
+
+    fun onLocationChanged(location: Location) {
+        val msg = "Updated Location: " +
+                location.latitude.toString() + "," +
+                location.longitude.toString()
+        showToast(msg)
+        val point = LatLng(location.latitude, location.longitude)
+        if (isDrawingPolyline) {
+            val rectOptions = PolylineOptions()
+                .color(Color.RED)
+                .width(5f)
+                .add(startPoint)
+                .add(point)
+            map.addPolyline(rectOptions)
+            isDrawingPolyline = false
+        } else {
+            startPoint = point
+            isDrawingPolyline = true
         }
     }
 
