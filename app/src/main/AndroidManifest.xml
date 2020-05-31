@@ -3,6 +3,7 @@
     package="ru.nsu.fit.android.drawalk">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -24,7 +25,8 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="Your_key_here"/>
+            android:value="AIzaSyBBRIWPRc787MWeGMOv1DFKjXyshLi1yPs"/>
+        <service android:name=".modules.map.LocationService" />
     </application>
 
 </manifest>

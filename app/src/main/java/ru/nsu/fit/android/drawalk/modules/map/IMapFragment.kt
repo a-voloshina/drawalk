@@ -9,4 +9,7 @@ abstract class IMapFragment : IViewFragment<IMapPresenter>(), PermissionResultHa
     abstract fun moveCamera(position : LatLng)
     abstract fun moveAndZoomCamera(position : LatLng, zoom: Float)
     abstract fun tryToGetLocation()
+    abstract fun turnDrawingModeOn()
+    abstract fun turnDrawingModeOff()
+    abstract fun cancelDrawing()
 }

@@ -22,11 +22,11 @@ class LocationPermissionCallback(
     private val permissionHelper = PermissionHelper(this, context)
 
     override fun onPermissionGranted(permissionName: String) {
-        resultHandler.handleSuccess()
+        resultHandler.handleSuccessfullyGetPermission()
     }
 
     override fun onPermissionDeclined(permissionName: String) {
-        resultHandler.handleFail()
+        resultHandler.handleCantGetPermission()
     }
 
     override fun onPermissionNeedExplanation(permissionName: String, explanationMessage: String) {
@@ -35,7 +35,7 @@ class LocationPermissionCallback(
                 permissionHelper.requestAfterExplanation(permissionName, LOCATION_REQUEST_CODE)
             }
             .setNegativeButton(R.string.decline) { _, _ ->
-                resultHandler.handleFail()
+                resultHandler.handleCantGetPermission()
             }
             .setTitle(R.string.permission_denied)
             .setMessage(explanationMessage)
@@ -48,7 +48,7 @@ class LocationPermissionCallback(
                 openSettingsScreen()
             }
             .setNegativeButton(R.string.decline) { _, _ ->
-                resultHandler.handleFail()
+                resultHandler.handleCantGetPermission()
             }
             .setTitle(permissionName)
             .setMessage(explanationMessage)

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.IntentSender
 import android.graphics.Color
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.view.LayoutInflater
@@ -13,15 +14,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.android.gms.tasks.Task
-
 import ru.nsu.fit.android.drawalk.R
-import java.lang.Exception
 
 class MapFragment : IMapFragment(), OnMapReadyCallback {
 
@@ -31,9 +32,13 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     private lateinit var map: GoogleMap
 
+    private var isDrawingModeOn = false
     private var isDrawingPolyline = false
     private lateinit var startPoint: LatLng
     private lateinit var locationCallback: LocationCallback
+    private lateinit var locationManager: LocationManager
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private val points: MutableList<LatLng> = ArrayList()
 
     private lateinit var myActivity: Activity
 
@@ -85,6 +90,19 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
             )
     }
 
+    override fun turnDrawingModeOn() {
+        isDrawingModeOn = true
+    }
+
+    override fun turnDrawingModeOff() {
+        isDrawingModeOn = false
+        points.clear()
+    }
+
+    override fun cancelDrawing() {
+        map.clear()
+    }
+
     override fun onMapReady(googleMap: GoogleMap?) {
         map = googleMap ?: throw Exception("got null GoogleMap in onMapReady")
         val explanationMessage = activity?.getString(R.string.explanation_dialog_message)
@@ -131,24 +149,20 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
         showToast("Can't open map without permission :(")
     }
 
-    override fun handleSuccess() {
+    override fun handleSuccessfullyGetPermission() {
         map.isMyLocationEnabled = true
-        map.setOnMyLocationButtonClickListener {
-            showToast("MyLocation button clicked")
-            return@setOnMyLocationButtonClickListener false
-        }
         map.setOnMyLocationClickListener { location ->
             showToast("Current location: $location")
         }
         val locationRequest = createLocationRequest()
-        if(locationRequest == null){
+        if (locationRequest == null) {
             showToast("get null locationRequest") //TODO: dialog?
         } else {
             startLocationUpdates(locationRequest)
         }
     }
 
-    override fun handleFail() {
+    override fun handleCantGetPermission() {
         showSadMessage()
     }
 
@@ -168,13 +182,34 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
         val client: SettingsClient = LocationServices.getSettingsClient(myActivity)
         client.checkLocationSettings(locationSettingsRequest)
 
-        LocationServices.getFusedLocationProviderClient(myActivity)
-            .requestLocationUpdates(locationRequest, object : LocationCallback() {
-                override fun onLocationResult(locationResult: LocationResult) {
-                    onLocationChanged(locationResult.lastLocation)
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(myActivity).apply {
+                requestLocationUpdates(locationRequest, object : LocationCallback() {
+                    override fun onLocationResult(locationResult: LocationResult) {
+                        onLocationChanged(locationResult.lastLocation)
+                    }
+                }, Looper.myLooper())
+            }
+        fusedLocationProviderClient.lastLocation    //TODO: check GPS
+            .addOnSuccessListener { location ->
+                showToast(
+                    "Lat is ${location.latitude} " +
+                            "+ Lng is ${location.longitude}"
+                )
+                moveAndZoomCamera(LatLng(location.latitude, location.longitude), 15f)
+            }
+            .addOnFailureListener { exception ->
+                if (exception is ResolvableApiException) {
+                    try {
+                        exception.startResolutionForResult(
+                            myActivity,
+                            REQUEST_CHECK_SETTINGS
+                        )
+                    } catch (sendEx: IntentSender.SendIntentException) {
+                        // Ignore the error.
+                    }
                 }
-            }, Looper.myLooper())
-
+            }
 //        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
 //        task.addOnSuccessListener { locationSettingsResponse ->
 //
@@ -197,20 +232,44 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
         val msg = "Updated Location: " +
                 location.latitude.toString() + "," +
                 location.longitude.toString()
-        showToast(msg)
-        val point = LatLng(location.latitude, location.longitude)
-        if (isDrawingPolyline) {
-            val rectOptions = PolylineOptions()
-                .color(Color.RED)
-                .width(5f)
-                .add(startPoint)
-                .add(point)
-            map.addPolyline(rectOptions)
-            isDrawingPolyline = false
-        } else {
-            startPoint = point
-            isDrawingPolyline = true
+        //showToast(msg)
+        if (isDrawingModeOn) {
+            //val point = LatLng(location.latitude, location.longitude)
+            points.add(LatLng(location.latitude, location.longitude))
+            redrawLine()
+//            val rectOptions = PolylineOptions()
+//                .color(Color.RED)
+//                .width(10f)
+//            if (points.size > 10) {
+//                for (point in points) {
+//                    rectOptions.add(point)
+//                }
+//                map.addPolyline(rectOptions)
+//                points.clear()
+//            }
+//            if (isDrawingPolyline) {
+//                val rectOptions = PolylineOptions()
+//                    .color(Color.RED)
+//                    .width(10f)
+//                    .add(startPoint)
+//                    .add(point)
+//                map.addPolyline(rectOptions)
+//                isDrawingPolyline = false
+//            } else {
+//                startPoint = point
+//                isDrawingPolyline = true
+//            }
         }
+    }
+
+    private fun redrawLine() {
+        map.clear()
+        val options = PolylineOptions()
+            .color(Color.RED)
+            .width(10f)
+            .geodesic(true)
+            .addAll(points)
+        map.addPolyline(options)
     }
 
 }
