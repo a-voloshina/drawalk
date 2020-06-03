@@ -13,4 +13,11 @@
         Это разрешение требуется для того,
         чтобы рисовать маршрут на основе вашей геолокации. Разрешить доступ к данным? </string>
     <string name="permission_denied">Отказано в разрешении</string>
+    <string name="gps_explanation_dialog_message">Для продолжения необходимо получение данных о местоположении.
+    Включить GPS?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="gps_explanation_message">Для получения данных о местоположении необходимо подключение к GPS.</string>
+    <string name="turn_on">ВКЛЮЧИТЬ</string>
+    <string name="warning_yellow_triangle">warning_yellow_triangle</string>
 </resources>

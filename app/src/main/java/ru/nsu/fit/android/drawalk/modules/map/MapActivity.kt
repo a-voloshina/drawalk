@@ -2,7 +2,10 @@ package ru.nsu.fit.android.drawalk.modules.map
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.provider.Settings
 import androidx.fragment.app.Fragment
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ActivityMapBinding
@@ -47,15 +50,21 @@ class MapActivity : SingleFragmentActivity() {
             play = if(play){
                 view.turnDrawingModeOff()
                 binding.playPauseFab.setImageResource(R.drawable.ic_play)
+                binding.playPauseFab.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#cccccc"))
                 false
             } else {
                 view.turnDrawingModeOn()
                 binding.playPauseFab.setImageResource(R.drawable.ic_pause)
+                binding.playPauseFab.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#1CC50F"))
                 true
             }
         }
         binding.cancelFab.setOnClickListener {
             view.cancelDrawing()
+        }
+        binding.stopFab.setOnLongClickListener {
+
+            return@setOnLongClickListener true
         }
     }
 

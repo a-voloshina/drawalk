@@ -2,15 +2,20 @@ package ru.nsu.fit.android.drawalk.modules.map
 
 import android.Manifest
 import android.app.Activity
-import android.content.IntentSender
+import android.app.AlertDialog
+import android.content.*
+import android.content.Context.LOCATION_SERVICE
 import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -31,16 +36,40 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
     }
 
     private lateinit var map: GoogleMap
-
-    private var isDrawingModeOn = false
-    private var isDrawingPolyline = false
-    private lateinit var startPoint: LatLng
     private lateinit var locationCallback: LocationCallback
-    private lateinit var locationManager: LocationManager
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val points: MutableList<LatLng> = ArrayList()
+    private lateinit var noGPSMessage: LinearLayout
 
-    private lateinit var myActivity: Activity
+    private val points: MutableList<LatLng> = ArrayList()
+    private val myActivity: Activity by lazy { activity as Activity }
+    private val locationManager: LocationManager by lazy {
+        myActivity.getSystemService(LOCATION_SERVICE) as LocationManager
+    }
+    private var isDrawingModeOn = false
+
+    private val gpsSwitchStateReceiver = object : BroadcastReceiver() {
+        private var firstTimeChange = true
+        override fun onReceive(context: Context, intent: Intent) {
+            if (LocationManager.PROVIDERS_CHANGED_ACTION == intent.action) {
+                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                val isNetworkEnabled =
+                    locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+                if (isGpsEnabled || isNetworkEnabled) {
+                    if (firstTimeChange) {
+                        firstTimeChange = false
+                        moveToCurrentLocation()
+                        showToast("GPS turned on first time")
+                    }
+                    showToast("GPS turned on")
+                    noGPSMessage.visibility = View.GONE
+                } else {
+                    showToast("GPS turned off")
+                    noGPSMessage.visibility = View.VISIBLE
+                }
+            }
+        }
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,7 +85,6 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        myActivity = activity as Activity
         getMap()
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
@@ -70,6 +98,19 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
                 map.addPolyline(rectOptions)
             }
         }
+        view.findViewById<TextView>(R.id.open_gps_settings_button)
+            .setOnClickListener {
+                openGPSSettingsScreen()
+            }
+        noGPSMessage = view.findViewById(R.id.no_gps_message)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION).apply {
+            addAction(Intent.ACTION_PROVIDER_CHANGED)
+        }
+        myActivity.registerReceiver(gpsSwitchStateReceiver, filter)
     }
 
     private fun getMap() {
@@ -103,6 +144,10 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
         map.clear()
     }
 
+    override fun stopDrawing() {
+        TODO("Not yet implemented")
+    }
+
     override fun onMapReady(googleMap: GoogleMap?) {
         map = googleMap ?: throw Exception("got null GoogleMap in onMapReady")
         val explanationMessage = activity?.getString(R.string.explanation_dialog_message)
@@ -111,21 +156,6 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 explanationMessage ?: ""
             )
-//        Toast.makeText(activity, "Map Ready", Toast.LENGTH_SHORT).show()
-//        map.setOnMapClickListener { point ->
-//            if (isDrawingPolyline) {
-//                val rectOptions = PolylineOptions()
-//                    .color(Color.RED)
-//                    .width(5f)
-//                    .add(startPoint)
-//                    .add(point)
-//                map.addPolyline(rectOptions)
-//                isDrawingPolyline = false
-//            } else {
-//                startPoint = point
-//                isDrawingPolyline = true
-//            }
-//        }
     }
 
     override fun addMarker(position: LatLng, title: String) {
@@ -149,6 +179,10 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
         showToast("Can't open map without permission :(")
     }
 
+    private fun showSadGPSMessage() {
+        showToast("Не могу определить местоположение без подключения к GPS :(")
+    }
+
     override fun handleSuccessfullyGetPermission() {
         map.isMyLocationEnabled = true
         map.setOnMyLocationClickListener { location ->
@@ -164,6 +198,14 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     override fun handleCantGetPermission() {
         showSadMessage()
+    }
+
+    override fun onGPSCheckingSuccess() {
+        moveToCurrentLocation()
+    }
+
+    override fun onGPSCheckingFailure() {
+        showSadGPSMessage()
     }
 
     private fun createLocationRequest(): LocationRequest? {
@@ -190,13 +232,44 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
                     }
                 }, Looper.myLooper())
             }
-        fusedLocationProviderClient.lastLocation    //TODO: check GPS
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            showGPSDisabledDialogToUser()
+            noGPSMessage.visibility = View.VISIBLE
+        } else {
+            moveToCurrentLocation()
+            noGPSMessage.visibility = View.GONE
+        }
+    }
+
+    fun onLocationChanged(location: Location) {
+        if (isDrawingModeOn) {
+            points.add(LatLng(location.latitude, location.longitude))
+            redrawLine()
+        }
+    }
+
+    private fun redrawLine() {
+        map.clear()
+        val options = PolylineOptions()
+            .color(Color.RED)
+            .width(10f)
+            .geodesic(true)
+            .addAll(points)
+        map.addPolyline(options)
+    }
+
+    private fun moveToCurrentLocation() {
+        fusedLocationProviderClient.lastLocation
             .addOnSuccessListener { location ->
-                showToast(
-                    "Lat is ${location.latitude} " +
-                            "+ Lng is ${location.longitude}"
-                )
-                moveAndZoomCamera(LatLng(location.latitude, location.longitude), 15f)
+                if (location != null) {               //FIXME: recheck location somehow
+                    showToast(
+                        "Lat is ${location.latitude} " +
+                                "+ Lng is ${location.longitude}"
+                    )
+                    moveAndZoomCamera(LatLng(location.latitude, location.longitude), 15f)
+                } else {
+                    showToast("receive null location")
+                }
             }
             .addOnFailureListener { exception ->
                 if (exception is ResolvableApiException) {
@@ -210,66 +283,23 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
                     }
                 }
             }
-//        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
-//        task.addOnSuccessListener { locationSettingsResponse ->
-//
-//        }
-//        task.addOnFailureListener { exception ->
-//            if (exception is ResolvableApiException) {
-//                try {
-//                    exception.startResolutionForResult(
-//                        myActivity,
-//                        REQUEST_CHECK_SETTINGS
-//                    )
-//                } catch (sendEx: IntentSender.SendIntentException) {
-//                    // Ignore the error.
-//                }
-//            }
-//        }
     }
 
-    fun onLocationChanged(location: Location) {
-        val msg = "Updated Location: " +
-                location.latitude.toString() + "," +
-                location.longitude.toString()
-        //showToast(msg)
-        if (isDrawingModeOn) {
-            //val point = LatLng(location.latitude, location.longitude)
-            points.add(LatLng(location.latitude, location.longitude))
-            redrawLine()
-//            val rectOptions = PolylineOptions()
-//                .color(Color.RED)
-//                .width(10f)
-//            if (points.size > 10) {
-//                for (point in points) {
-//                    rectOptions.add(point)
-//                }
-//                map.addPolyline(rectOptions)
-//                points.clear()
-//            }
-//            if (isDrawingPolyline) {
-//                val rectOptions = PolylineOptions()
-//                    .color(Color.RED)
-//                    .width(10f)
-//                    .add(startPoint)
-//                    .add(point)
-//                map.addPolyline(rectOptions)
-//                isDrawingPolyline = false
-//            } else {
-//                startPoint = point
-//                isDrawingPolyline = true
-//            }
-        }
+    private fun showGPSDisabledDialogToUser() {
+        AlertDialog.Builder(myActivity)
+            .setMessage(getString(R.string.gps_explanation_dialog_message))
+            .setPositiveButton(R.string.yes) { _, _ ->
+                openGPSSettingsScreen()
+            }
+            .setNegativeButton(R.string.no) { _, _ ->
+                showSadGPSMessage()
+            }
+            .create()
+            .show()
     }
 
-    private fun redrawLine() {
-        map.clear()
-        val options = PolylineOptions()
-            .color(Color.RED)
-            .width(10f)
-            .geodesic(true)
-            .addAll(points)
-        map.addPolyline(options)
+    private fun openGPSSettingsScreen() {
+        startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
     }
 
 }
