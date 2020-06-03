@@ -7,5 +7,6 @@ data class GpsArt(
     var authorId: String = "",
     var name: String = "",
     var parts: List<ArtPolyLine> = listOf(),
-    var created: Timestamp = Timestamp.now()
+    var created: Timestamp = Timestamp.now(),
+    var previewUrl: String = ""
 )

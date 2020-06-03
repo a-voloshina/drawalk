@@ -17,7 +17,7 @@ import java.io.ByteArrayOutputStream
 import java.security.SecureRandom
 import java.util.*
 
-object FirestoreHolder {
+object FirebaseHolder {
     val DB = Firebase.firestore
     val ARTS = DB.collection("arts")
     val USERS = DB.collection("users")
@@ -40,7 +40,7 @@ object FirestoreHolder {
                             ),
                             PointSettings(0, 5)
                         )
-                    ), Timestamp.now()
+                    ), Timestamp.now(), "SOME_URL"
                 )
             )
             .addOnFailureListener {

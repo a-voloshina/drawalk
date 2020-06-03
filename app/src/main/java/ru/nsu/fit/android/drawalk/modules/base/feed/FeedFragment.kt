@@ -48,6 +48,9 @@ abstract class FeedFragment<T: Parcelable>(layoutId: Int = R.layout.fragment_fee
             adapter.dataCapacity = savedInstanceState.get("capacity") as? Int?
         }
 
+        presenter = providePresenter(this, data)
+        presenter.getDataCapacity()
+
         return view
     }
 
@@ -89,6 +92,7 @@ abstract class FeedFragment<T: Parcelable>(layoutId: Int = R.layout.fragment_fee
     }
 
     protected abstract fun provideAdapter(view: RecyclerView, data: List<T?>): AutoLoadingRecyclerAdapter<T, RecyclerView.ViewHolder>
+    protected abstract fun providePresenter(view: IFeedFragment<T>, data: List<T?>): IFeedPresenter
 
     override fun setDataCapacity(cap: Int?) {
         adapter.dataCapacity = cap

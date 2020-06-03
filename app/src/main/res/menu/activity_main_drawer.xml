@@ -8,5 +8,9 @@
             android:id="@+id/nav_arts"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/arts_feed"/>
+        <item
+            android:id="@+id/nav_users"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/users_feed"/>
     </group>
 </menu>

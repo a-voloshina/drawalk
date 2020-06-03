@@ -3,7 +3,7 @@
     <string name="cancell_next">Calc, cancell next</string>
     <string name="simple">Calc (simple)</string>
     <string name="calc_placeholder">Calculation result</string>
-    <string name="to_feed">To Feed</string>
+    <string name="to_feed">Add art</string>
     <string name="id_placeholder">ID</string>
     <string name="author_id_placeholder">Author ID</string>
     <string name="art_miniature_description">Art miniature</string>
@@ -19,4 +19,5 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="arts_feed">Latest arts</string>
+    <string name="users_feed">Users</string>
 </resources>

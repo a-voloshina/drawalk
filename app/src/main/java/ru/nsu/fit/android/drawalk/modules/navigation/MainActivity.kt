@@ -1,5 +1,6 @@
 package ru.nsu.fit.android.drawalk.modules.navigation
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ActivityMainBinding
+import ru.nsu.fit.android.drawalk.modules.example.ExampleActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_arts
+                R.id.nav_arts, R.id.nav_users
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Will open art creation", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
+            startActivity(Intent(this, ExampleActivity::class.java))
         }
     }
 

@@ -2,7 +2,7 @@ package ru.nsu.fit.android.drawalk.modules.base.feed
 
 import ru.nsu.fit.android.drawalk.common.UseCase
 
-abstract class FeedPresenter<T : Any>(
+abstract class UseCaseFeedPresenter<T : Any>(
     private val view: IFeedFragment<T>,
     private val data: List<T?>,
     private val pageSize: Int

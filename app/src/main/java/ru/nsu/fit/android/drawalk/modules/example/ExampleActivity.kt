@@ -3,7 +3,7 @@ package ru.nsu.fit.android.drawalk.modules.example
 import android.os.Bundle
 import ru.nsu.fit.android.drawalk.databinding.ActivityExampleBinding
 import ru.nsu.fit.android.drawalk.modules.base.SingleFragmentActivity
-import ru.nsu.fit.android.drawalk.utils.FirestoreHolder
+import ru.nsu.fit.android.drawalk.utils.FirebaseHolder
 
 class ExampleActivity: SingleFragmentActivity() {
     private var counter = 0
@@ -27,8 +27,11 @@ class ExampleActivity: SingleFragmentActivity() {
         binding.repeateble.setOnClickListener {
             presenter.calcWithoutCancel(counter++.toString())
         }
+        binding.feed.setOnClickListener {
+            FirebaseHolder.addStubArt()
+        }
         binding.delete.setOnClickListener {
-            FirestoreHolder.clearAll()
+            FirebaseHolder.clearAll()
         }
     }
 }
