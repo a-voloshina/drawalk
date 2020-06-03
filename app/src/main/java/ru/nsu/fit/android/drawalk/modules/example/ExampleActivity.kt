@@ -1,10 +1,9 @@
 package ru.nsu.fit.android.drawalk.modules.example
 
-import android.content.Intent
 import android.os.Bundle
-import ru.nsu.ccfit.molochev.android.rssample.modules.base.SingleFragmentActivity
 import ru.nsu.fit.android.drawalk.databinding.ActivityExampleBinding
-import ru.nsu.fit.android.drawalk.modules.arts.ArtsFeedActivity
+import ru.nsu.fit.android.drawalk.modules.base.SingleFragmentActivity
+import ru.nsu.fit.android.drawalk.utils.FirestoreHolder
 
 class ExampleActivity: SingleFragmentActivity() {
     private var counter = 0
@@ -28,8 +27,8 @@ class ExampleActivity: SingleFragmentActivity() {
         binding.repeateble.setOnClickListener {
             presenter.calcWithoutCancel(counter++.toString())
         }
-        binding.feed.setOnClickListener {
-            startActivity(Intent(this, ArtsFeedActivity::class.java))
+        binding.delete.setOnClickListener {
+            FirestoreHolder.clearAll()
         }
     }
 }

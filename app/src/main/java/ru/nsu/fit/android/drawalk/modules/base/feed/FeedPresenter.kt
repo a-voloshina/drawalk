@@ -1,11 +1,13 @@
-package ru.nsu.fit.android.drawalk.modules.feed
+package ru.nsu.fit.android.drawalk.modules.base.feed
 
 import ru.nsu.fit.android.drawalk.common.UseCase
 
-abstract class FeedPresenter<T: Any>(
-    private val view: IFeedActivity<T>
+abstract class FeedPresenter<T : Any>(
+    private val view: IFeedFragment<T>,
+    private val data: List<T?>,
+    private val pageSize: Int
 ) : IFeedPresenter {
-    protected  abstract val loadUseCase: UseCase<Int, List<T>>
+    protected abstract val loadUseCase: UseCase<Page, List<T>>
     private var loading = false
 
     protected fun initCallbacks() {
@@ -28,10 +30,15 @@ abstract class FeedPresenter<T: Any>(
     }
 
     private fun load() {
-        if (!loading) {
-            loading = true
-            view.startLoading()
-            loadUseCase.execute()
+        if (loading) {
+            return
         }
+        loading = true
+        loadUseCase.request(Page(data.size, pageSize))
+        view.startLoading()
+        loadUseCase.execute()
+
     }
+
+    data class Page(var offset: Int, var limit: Int)
 }

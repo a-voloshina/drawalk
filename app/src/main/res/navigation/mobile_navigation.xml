@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_arts">
+
+    <fragment
+        android:id="@+id/nav_arts"
+        android:name="ru.nsu.fit.android.drawalk.modules.navigation.fragments.arts.ArtsFeedFragment"
+        android:label="@string/arts_feed"
+        tools:layout="@layout/fragment_feed"/>
+</navigation>

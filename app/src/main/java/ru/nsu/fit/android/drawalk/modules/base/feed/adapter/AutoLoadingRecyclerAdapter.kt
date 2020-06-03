@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.components.autoloading
+package ru.nsu.fit.android.drawalk.modules.base.feed.adapter
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,6 +28,7 @@ abstract class AutoLoadingRecyclerAdapter<T : Any, VH : ViewHolder>(
 
     lateinit var loadMoreListener: OnLoadMoreListener
     var visibleThreshold = 5
+    var dataCapacity: Int? = null
 
     private var isLoading = startWthLoading
     private var lastVisibleItem = 0
@@ -47,7 +48,11 @@ abstract class AutoLoadingRecyclerAdapter<T : Any, VH : ViewHolder>(
                 super.onScrolled(recyclerView, dx, dy)
                 totalItemCount = linearLayoutManager.itemCount
                 lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition()
-                if (!isLoading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+
+                val dataLimitReached = totalItemCount >= (dataCapacity ?: Int.MAX_VALUE)
+                if (!isLoading
+                    && !dataLimitReached
+                    && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
                     isLoading = true
                     if (!adapter::loadMoreListener.isInitialized) {
                         throw RuntimeException("No load listener")
@@ -63,7 +68,6 @@ abstract class AutoLoadingRecyclerAdapter<T : Any, VH : ViewHolder>(
     }
 
     override fun getItemViewType(position: Int): Int {
-        Log.d("AUTO_LOADING_ADAPTER", "Type: Position is $position, data size is ${data.size}")
         return if (data[position] == null) VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
     }
 
@@ -78,7 +82,9 @@ abstract class AutoLoadingRecyclerAdapter<T : Any, VH : ViewHolder>(
             VIEW_TYPE_LOADING -> {
                 val view = LayoutInflater.from(parent.context)
                     .inflate(R.layout.item_loading, parent, false)
-                LoadingViewHolder(view)
+                LoadingViewHolder(
+                    view
+                )
             }
             else -> throw RuntimeException("Incorrect view type")
         }

@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "347000165391",
-    "firebase_url": "https://drawalk-mobile.firebaseio.com",
-    "project_id": "drawalk-mobile",
-    "storage_bucket": "drawalk-mobile.appspot.com"
+    "project_number": "993791893829",
+    "firebase_url": "https://drawalk-mobile-app.firebaseio.com",
+    "project_id": "drawalk-mobile-app",
+    "storage_bucket": "drawalk-mobile-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:347000165391:android:b73321e6b1e696f78bff7a",
+        "mobilesdk_app_id": "1:993791893829:android:f05bb2459a7575c36f1e2c",
         "android_client_info": {
           "package_name": "ru.nsu.fit.android.drawalk"
         }
       },
       "oauth_client": [
         {
-          "client_id": "347000165391-5ot0i0ntcl59bvv4ruc42k23sf0aeucs.apps.googleusercontent.com",
+          "client_id": "993791893829-ec1bi2up9er0g38e3eqoru2jkkdr3t4f.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ru.nsu.fit.android.drawalk",
@@ -23,20 +23,20 @@
           }
         },
         {
-          "client_id": "347000165391-5g9cv8t6m2ftgb5ogq642tje3a3njl86.apps.googleusercontent.com",
+          "client_id": "993791893829-tn1lceoiln5o1qmtglhg46qcddj1dqst.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAGg1zgMiBEXzSrjq__coulNuc8xiI0phE"
+          "current_key": "AIzaSyBV5cni4NDmaat2Hk2omBmDZNdm32ZUtfc"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "347000165391-5g9cv8t6m2ftgb5ogq642tje3a3njl86.apps.googleusercontent.com",
+              "client_id": "993791893829-tn1lceoiln5o1qmtglhg46qcddj1dqst.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
