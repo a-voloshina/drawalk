@@ -15,7 +15,7 @@ data class GpsArtData(
     var authorId: String,
     var authorName: String,
     var created: Date,
-    var imageUrl: String
+    var imageUrl: String?
 ): Parcelable {
     constructor(art: GpsArt, authorName: String): this(
         art.id,

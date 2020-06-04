@@ -1,8 +1,12 @@
 package ru.nsu.fit.android.drawalk.modules.navigation.fragments.arts
 
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ItemArtBinding
 import ru.nsu.fit.android.drawalk.model.GpsArtData
@@ -15,6 +19,16 @@ class ArtsFeedFragment: FeedFragment<GpsArtData>() {
         AutoLoadingRecyclerAdapter<GpsArtData, RecyclerView.ViewHolder>(recyclerView, data) {
         inner class ArtViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             var binding = ItemArtBinding.bind(view)
+
+            fun startLoading() {
+                binding.art.visibility = GONE
+                binding.progress.visibility = VISIBLE
+            }
+
+            fun stopLoading() {
+                binding.progress.visibility = GONE
+                binding.art.visibility = VISIBLE
+            }
         }
 
         override val dataItemLayoutId = R.layout.item_art
@@ -27,10 +41,26 @@ class ArtsFeedFragment: FeedFragment<GpsArtData>() {
             val artHolder = holder as? ArtViewHolder
                 ?: throw RuntimeException("Wrong holder type")
             val binding = artHolder.binding
-            binding.txtName.text = item.name
-            binding.txtAuthorName.text = item.authorName
             binding.root.setOnClickListener {
                 Toast.makeText(activity, "Picked art with ID ${item.id}", Toast.LENGTH_SHORT).show()
+            }
+            binding.txtName.text = item.name
+            binding.txtAuthorName.text = item.authorName
+            binding.art.setImageResource(R.mipmap.no_preview)
+            item.imageUrl.takeIf { it?.isNotBlank() == true }?.let {
+                artHolder.startLoading()
+                Picasso.get()
+                    .load(item.imageUrl)
+                    .error(R.mipmap.preview_not_found)
+                    .into(binding.art, object: Callback{
+                        override fun onSuccess() {
+                            artHolder.stopLoading()
+                        }
+
+                        override fun onError(e: Exception?) {
+                            artHolder.stopLoading()
+                        }
+                    })
             }
         }
     }
