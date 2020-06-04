@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">DraWalk Application</string>
-    <string name="cancell_next">Calc, cancell next</string>
+    <string name="cancel_next">Calc, cancel next</string>
     <string name="simple">Calc (simple)</string>
     <string name="calc_placeholder">Calculation result</string>
     <string name="allow">Разрешить</string>
@@ -20,4 +20,9 @@
     <string name="gps_explanation_message">Для получения данных о местоположении необходимо подключение к GPS.</string>
     <string name="turn_on">ВКЛЮЧИТЬ</string>
     <string name="warning_yellow_triangle">warning_yellow_triangle</string>
+    <string name="map_snapshot_view">map_snapshot_view</string>
+    <string name="image_uri">Image uri</string>
+    <string name="save">Сохранить</string>
+    <string name="dialog_toolbar_title">Сохранить результат</string>
+    <string name="share">Поделиться</string>
 </resources>

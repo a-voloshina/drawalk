@@ -15,4 +15,5 @@ abstract class IMapFragment : IViewFragment<IMapPresenter>(), PermissionResultHa
     abstract fun turnDrawingModeOff()
     abstract fun cancelDrawing()
     abstract fun stopDrawing()
+    abstract fun checkGPSisOn(): Boolean
 }

@@ -4,7 +4,12 @@
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
 
+    <color name="colorPrimaryDialog">#FFFFFF</color>
+    <color name="colorPrimaryDarkDialog">#F4FFF8</color>
+    <color name="colorAccentDialog">#ff79b0</color>
+
     <color name="white">#ffff</color>
+    <color name="milky">#F8FFD2</color>
     <color name="green">#1CC50F</color>
     <color name="grey_20">#cccccc</color>
     <color name="grey_80">#37474F</color>

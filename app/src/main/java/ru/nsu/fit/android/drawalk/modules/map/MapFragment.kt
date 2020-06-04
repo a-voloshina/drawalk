@@ -5,11 +5,14 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.*
 import android.content.Context.LOCATION_SERVICE
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
@@ -28,15 +31,18 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import ru.nsu.fit.android.drawalk.R
+import ru.nsu.fit.android.drawalk.modules.base.AsynchronousWorkActivity
+import java.io.File
+import java.io.FileOutputStream
 
 class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     companion object {
         const val REQUEST_CHECK_SETTINGS = 128
+        const val DIALOG_TAG = "show MapSnapshotDialog"
     }
 
-    private lateinit var map: GoogleMap
-    private lateinit var locationCallback: LocationCallback
+    private lateinit var map: GoogleMap //
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var noGPSMessage: LinearLayout
 
@@ -44,6 +50,13 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
     private val myActivity: Activity by lazy { activity as Activity }
     private val locationManager: LocationManager by lazy {
         myActivity.getSystemService(LOCATION_SERVICE) as LocationManager
+    }
+
+    private val options: PolylineOptions by lazy {
+        PolylineOptions()
+            .color(Color.RED)
+            .width(10f)
+            .geodesic(true)
     }
     private var isDrawingModeOn = false
 
@@ -60,10 +73,8 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
                         moveToCurrentLocation()
                         showToast("GPS turned on first time")
                     }
-                    showToast("GPS turned on")
                     noGPSMessage.visibility = View.GONE
                 } else {
-                    showToast("GPS turned off")
                     noGPSMessage.visibility = View.VISIBLE
                 }
             }
@@ -86,18 +97,6 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getMap()
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult?) {
-                locationResult ?: return
-                val rectOptions = PolylineOptions()
-                    .color(Color.BLUE)
-                    .width(5f)
-                for (location in locationResult.locations) {
-                    rectOptions.add(LatLng(location.latitude, location.longitude))
-                }
-                map.addPolyline(rectOptions)
-            }
-        }
         view.findViewById<TextView>(R.id.open_gps_settings_button)
             .setOnClickListener {
                 openGPSSettingsScreen()
@@ -137,7 +136,6 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     override fun turnDrawingModeOff() {
         isDrawingModeOn = false
-        points.clear()
     }
 
     override fun cancelDrawing() {
@@ -145,7 +143,13 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
     }
 
     override fun stopDrawing() {
-        TODO("Not yet implemented")
+        //points.clear()
+        //turnDrawingModeOff()            //TODO: bind with ui
+        takeMapSnapshot()
+    }
+
+    override fun checkGPSisOn(): Boolean {
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {
@@ -250,11 +254,7 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     private fun redrawLine() {
         map.clear()
-        val options = PolylineOptions()
-            .color(Color.RED)
-            .width(10f)
-            .geodesic(true)
-            .addAll(points)
+        options.addAll(points)
         map.addPolyline(options)
     }
 
@@ -300,6 +300,52 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     private fun openGPSSettingsScreen() {
         startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+    }
+
+    private fun takeMapSnapshot() {
+        val asynchronousWorkActivity = myActivity as AsynchronousWorkActivity
+        asynchronousWorkActivity.startProgressBar()
+        map.snapshot { bitmap ->
+            val uri = saveToInternalStorage(bitmap)
+            asynchronousWorkActivity.stopProgressBar()
+            openMapSnapshotDialog(uri)
+        }
+    }
+
+    private fun saveToInternalStorage(bitmap: Bitmap): Uri {
+        val wrapper = ContextWrapper(myActivity.applicationContext)
+        var file = wrapper.getDir("Images", Context.MODE_PRIVATE)
+        file = File(file, "UniqueFileName" + ".jpg")
+        val stream = FileOutputStream(file)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        stream.flush()
+        stream.close()
+        return Uri.parse(file.absolutePath)
+    }
+
+    private fun openShareImageDialog(filePath: String) {
+        val file: File = myActivity.getFileStreamPath(filePath)
+        if (filePath != "") {
+            val values = ContentValues(2)
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            values.put(MediaStore.Images.Media.DATA, file.absolutePath)
+            val contentUriFile =
+                myActivity.contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    values
+                )
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "image/jpeg"
+            intent.putExtra(Intent.EXTRA_STREAM, contentUriFile)
+            startActivity(Intent.createChooser(intent, "Share Image"))
+        } else {
+            //This is a custom class I use to show dialogs...simply replace this with whatever you want to show an error message, Toast, etc.
+            showToast("share image failed")
+        }
+    }
+
+    private fun openMapSnapshotDialog(imageUri: Uri) {
+        MapSnapshotDialog(imageUri).show(childFragmentManager, DIALOG_TAG)
     }
 
 }
