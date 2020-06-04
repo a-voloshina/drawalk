@@ -51,7 +51,7 @@ class ArtsFeedFragment: FeedFragment<GpsArtData>() {
                 artHolder.startLoading()
                 Picasso.get()
                     .load(item.imageUrl)
-                    .error(R.mipmap.preview_not_found)
+                    .error(R.mipmap.no_preview)
                     .into(binding.art, object: Callback{
                         override fun onSuccess() {
                             artHolder.stopLoading()

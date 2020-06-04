@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -24,6 +25,8 @@ object FirebaseHolder {
 
     val STORAGE = Firebase.storage.reference
     val ART_IMAGES = STORAGE.child("images/art_previews")
+
+    val AUTH = Firebase.auth
 
     fun addStubArt() {
         val id = UUID.randomUUID().toString()
@@ -135,7 +138,7 @@ object FirebaseHolder {
         onError: (Exception?) -> Unit = {},
         compressionQuality: Int = 100
     ): UploadTask {
-        val userId = UUID.randomUUID().toString()   //TODO: get current user's ID
+        val userId = AUTH.currentUser?.uid ?: throw RuntimeException("User is not authenticated")
         val artId = UUID.randomUUID().toString()
 
         return uploadImage(
@@ -157,5 +160,70 @@ object FirebaseHolder {
                 onError(it)
             }, compressionQuality
         )
+    }
+
+    fun tryToAddNewUserData(id: String, name: String, imageUrl: String?) {
+        val user = USERS.document(id)
+        Log.d("AU", "Start")
+        user.get().addOnSuccessListener {
+            Log.d("AU", "Got")
+            if (!it.exists()) {
+                Log.d("AU", "No user, start create")
+                user.set(UserData(id, name, imageUrl)).addOnSuccessListener {
+                    Log.d("AU", "Created")
+                }.addOnFailureListener {
+                    Log.d("AU", "Fail create: $it")
+                }
+            }
+        }.addOnFailureListener {
+            Log.d("AU", "Fail get: $it")
+        }
+    }
+
+    fun deleteArt(artId: String, onSuccess: () -> Unit = {}, onError: (Exception?) -> Unit = {}) {
+        val userId = AUTH.currentUser?.uid ?: throw RuntimeException("User is not authenticated")
+        val art = ARTS.document(artId)
+        art.get().addOnSuccessListener {
+            val data = it.toObject(GpsArt::class.java)
+            if (data == null) {
+                onError(RuntimeException("Cannot cast data to GpsArt"))
+                return@addOnSuccessListener
+            }
+            if (data.authorId != userId) {
+                onError(RuntimeException("You are not author of this art"))
+            } else {
+                art.delete().addOnFailureListener { e ->
+                    onError(e)
+                }.addOnSuccessListener {
+                    onSuccess()
+                }
+            }
+        }
+    }
+
+    fun renameArt(
+        artId: String,
+        newName: String ,
+        onSuccess: () -> Unit = {},
+        onError: (Exception?) -> Unit = {}
+    ) {
+        val userId = AUTH.currentUser?.uid ?: throw RuntimeException("User is not authenticated")
+        val art = ARTS.document(artId)
+        art.get().addOnSuccessListener {
+            val data = it.toObject(GpsArt::class.java)
+            if (data == null) {
+                onError(RuntimeException("Cannot cast data to GpsArt"))
+                return@addOnSuccessListener
+            }
+            if (data.authorId != userId) {
+                onError(RuntimeException("You are not author of this art"))
+            } else {
+                art.update("name", newName).addOnFailureListener { e ->
+                    onError(e)
+                }.addOnSuccessListener {
+                    onSuccess()
+                }
+            }
+        }
     }
 }

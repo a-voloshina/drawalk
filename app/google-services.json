@@ -8,14 +8,14 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:993791893829:android:f05bb2459a7575c36f1e2c",
+        "mobilesdk_app_id": "1:993791893829:android:b1c911bb8425423c6f1e2c",
         "android_client_info": {
           "package_name": "ru.nsu.fit.android.drawalk"
         }
       },
       "oauth_client": [
         {
-          "client_id": "993791893829-ec1bi2up9er0g38e3eqoru2jkkdr3t4f.apps.googleusercontent.com",
+          "client_id": "993791893829-0tsa959np0bf0s3k89635mpi77r4u49c.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ru.nsu.fit.android.drawalk",

@@ -17,4 +17,6 @@
 
     <string name="arts_feed">Latest arts</string>
     <string name="users_feed">Users</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_out">Sign out</string>
 </resources>
