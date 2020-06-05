@@ -10,7 +10,7 @@ import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.DialogMapSnapshotBinding
 
 class MapSnapshotDialog(private val imageUri: Uri) : DialogFragment() {
-    private lateinit var binding: DialogMapSnapshotBinding//DialogMapSnapshotBinding
+    private lateinit var binding: DialogMapSnapshotBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +46,7 @@ class MapSnapshotDialog(private val imageUri: Uri) : DialogFragment() {
         binding.mapImage.setImageURI(imageUri)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
         binding.toolbar.setTitle(R.string.dialog_toolbar_title)
-        binding.toolbar.inflateMenu(R.menu.menu_map_snapshot)
+        binding.toolbar.inflateMenu(R.menu.menu_map)
         binding.toolbar.setOnMenuItemClickListener {
             dismiss()                           //TODO: save at storage
             return@setOnMenuItemClickListener true

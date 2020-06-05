@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="size_small">8dp</dimen>
+    <dimen name="size_medium">16dp</dimen>
+
     <dimen name="med_fab_margin">16dp</dimen>
     <dimen name="mini_fab_margin">10dp</dimen>
+
+    <dimen name="text_size_medium">18sp</dimen>
+    <dimen name="text_size_large">24sp</dimen>
+
+    <dimen name="dimens_12dp">12dp</dimen>
 </resources>

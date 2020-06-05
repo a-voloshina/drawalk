@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -35,29 +36,27 @@ import ru.nsu.fit.android.drawalk.modules.base.AsynchronousWorkActivity
 import java.io.File
 import java.io.FileOutputStream
 
-class MapFragment : IMapFragment(), OnMapReadyCallback {
+class MapFragment : IMapFragment(), OnMapReadyCallback, MapDrawingSettingsListener {
 
     companion object {
         const val REQUEST_CHECK_SETTINGS = 128
-        const val DIALOG_TAG = "show MapSnapshotDialog"
+        const val DIALOG_TAG = "show dialog in MapFragment"
     }
 
     private lateinit var map: GoogleMap //
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var noGPSMessage: LinearLayout
+    private var currentLineColor: Int = Color.RED
+    private var currentLineWidth: Int = 10
 
+    private val pointsList: MutableList<MapPoint> = ArrayList()
     private val points: MutableList<LatLng> = ArrayList()
     private val myActivity: Activity by lazy { activity as Activity }
     private val locationManager: LocationManager by lazy {
         myActivity.getSystemService(LOCATION_SERVICE) as LocationManager
     }
 
-    private val options: PolylineOptions by lazy {
-        PolylineOptions()
-            .color(Color.RED)
-            .width(10f)
-            .geodesic(true)
-    }
+    private var options: PolylineOptions = makeOptions()
     private var isDrawingModeOn = false
 
     private val gpsSwitchStateReceiver = object : BroadcastReceiver() {
@@ -102,6 +101,15 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
                 openGPSSettingsScreen()
             }
         noGPSMessage = view.findViewById(R.id.no_gps_message)
+        view.findViewById<Toolbar>(R.id.map_toolbar).apply {
+            setTitle(R.string.app_name)
+            setTitleTextColor(Color.WHITE)
+            inflateMenu(R.menu.menu_map_fragment)
+            setOnMenuItemClickListener {
+                openMapDrawingSettingsDialog()
+                return@setOnMenuItemClickListener true
+            }
+        }
     }
 
     override fun onResume() {
@@ -145,6 +153,7 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
     override fun stopDrawing() {
         //points.clear()
         //turnDrawingModeOff()            //TODO: bind with ui
+        finish()
         takeMapSnapshot()
     }
 
@@ -160,6 +169,18 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 explanationMessage ?: ""
             )
+        //setTestPointsSet()
+        map.setOnMapClickListener { location ->
+            //showToast("Location: ${location.latitude}, ${location.longitude}")
+
+            val mapPoint = MapPoint(
+                LatLng(location.latitude, location.longitude),
+                currentLineColor,
+                currentLineWidth.toFloat()
+            )
+            pointsList.add(mapPoint)
+            redrawLine()
+        }
     }
 
     override fun addMarker(position: LatLng, title: String) {
@@ -212,6 +233,12 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
         showSadGPSMessage()
     }
 
+    override fun onMapDrawingSettingsChanged(color: Int, width: Int) {
+        currentLineColor = color
+        currentLineWidth = width
+        //options = makeOptions()
+    }
+
     private fun createLocationRequest(): LocationRequest? {
         return LocationRequest.create()?.apply {
             interval = 10000    //location updates rate in milliseconds
@@ -247,15 +274,75 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
 
     fun onLocationChanged(location: Location) {
         if (isDrawingModeOn) {
-            points.add(LatLng(location.latitude, location.longitude))
+            //points.add(LatLng(location.latitude, location.longitude))
+            val mapPoint = MapPoint(
+                LatLng(location.latitude, location.longitude),
+                currentLineColor,
+                currentLineWidth.toFloat()
+            )
+            pointsList.add(mapPoint)
+            //drawPoint(mapPoint)
             redrawLine()
         }
     }
 
+    private fun drawPoint(mapPoint: MapPoint) {
+        options
+            .color(mapPoint.color)
+            .width(mapPoint.width)
+            .geodesic(true)
+            .add(mapPoint.coordinate)
+        map.addPolyline(options)
+    }
+
     private fun redrawLine() {
         map.clear()
-        options.addAll(points)
-        map.addPolyline(options)
+        //options.addAll(points)
+//        for (mapPoint in pointsList) {
+//            val options = PolylineOptions()
+//                .color(mapPoint.color)
+//                .width(mapPoint.width)
+//                .geodesic(true)
+//                .add(mapPoint.coordinate)
+//            map.addPolyline(options)
+//        }
+        showPolyline()
+    }
+
+    private fun showPolyline() {
+        if (pointsList.size < 2) return
+        var ix = 0
+        var currentPoint: MapPoint = pointsList[ix]
+        var currentColor: Int = currentPoint.color
+        var currentWidth = currentPoint.width
+        val currentSegment: MutableList<LatLng> = ArrayList()
+        currentSegment.add(currentPoint.coordinate)
+        ix++
+        while (ix < pointsList.size) {
+            currentPoint = pointsList[ix]
+            if (currentPoint.color == currentColor && currentPoint.width == currentWidth) {
+                currentSegment.add(currentPoint.coordinate)
+            } else {
+                currentSegment.add(currentPoint.coordinate)
+                map.addPolyline(
+                    PolylineOptions()
+                        .addAll(currentSegment)
+                        .color(currentColor)
+                        .width(currentWidth)
+                )
+                currentColor = currentPoint.color
+                currentWidth = currentPoint.width
+                currentSegment.clear()
+                currentSegment.add(currentPoint.coordinate)
+            }
+            ix++
+        }
+        map.addPolyline(
+            PolylineOptions()
+                .addAll(currentSegment)
+                .color(currentColor)
+                .width(currentWidth)
+        )
     }
 
     private fun moveToCurrentLocation() {
@@ -339,13 +426,104 @@ class MapFragment : IMapFragment(), OnMapReadyCallback {
             intent.putExtra(Intent.EXTRA_STREAM, contentUriFile)
             startActivity(Intent.createChooser(intent, "Share Image"))
         } else {
-            //This is a custom class I use to show dialogs...simply replace this with whatever you want to show an error message, Toast, etc.
             showToast("share image failed")
         }
     }
 
     private fun openMapSnapshotDialog(imageUri: Uri) {
         MapSnapshotDialog(imageUri).show(childFragmentManager, DIALOG_TAG)
+    }
+
+    private fun openMapDrawingSettingsDialog() {
+        MapDrawingSettingsDialog(
+            currentLineColor,
+            currentLineWidth,
+            this
+        ).show(childFragmentManager, DIALOG_TAG)
+    }
+
+    private fun makeOptions(): PolylineOptions {
+        return PolylineOptions()
+            .color(currentLineColor)
+            .width(currentLineWidth.toFloat())
+            .geodesic(true)
+    }
+
+    private fun finish() {
+        if (pointsList.size > 1) {
+            addMarker(pointsList[0].coordinate, getString(R.string.start))
+            addMarker(pointsList[pointsList.size - 1].coordinate, getString(R.string.finish))
+        }
+    }
+
+    private fun setTestPointsSet() {
+        pointsList.add(
+            MapPoint(
+                LatLng(53.0957724, 91.41591399),
+                Color.MAGENTA,
+                8f
+            )
+        )
+        pointsList.add(
+            MapPoint(
+                LatLng(53.0957724, 91.41591399),
+                Color.MAGENTA,
+                8f
+            )
+        )
+        pointsList.add(
+            MapPoint(
+                LatLng(53.0957110, 91.41754799),
+                Color.RED,
+                15f
+            )
+        )
+        pointsList.add(
+            MapPoint(
+                LatLng(53.0957110, 91.41754799),
+                Color.RED,
+                15f
+            )
+        )
+        pointsList.add(
+            MapPoint(
+                LatLng(53.09531541, 91.41750823),
+                Color.GREEN,
+                5f
+            )
+        )
+        pointsList.add(
+            MapPoint(
+                LatLng(53.09531541, 91.41750823),
+                Color.GREEN,
+                5f
+            )
+        )
+        pointsList.add(
+            MapPoint(
+                LatLng(53.095293651, 91.41601257),
+                Color.BLUE,
+                12f
+            )
+        )
+        pointsList.add(
+            MapPoint(
+                LatLng(53.095293651, 91.41601257),
+                Color.BLUE,
+                12f
+            )
+        )
+        pointsList.add(
+            MapPoint(
+                LatLng(53.0957724, 91.41591399),
+                Color.MAGENTA,
+                8f
+            )
+        )
+        redrawLine()
+//        for (mapPoint in pointsList) {
+//            drawPoint(mapPoint)
+//        }
     }
 
 }

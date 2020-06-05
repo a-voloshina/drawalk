@@ -9,8 +9,27 @@
     <color name="colorAccentDialog">#ff79b0</color>
 
     <color name="white">#ffff</color>
+    <color name="black">#000000</color>
     <color name="milky">#F8FFD2</color>
     <color name="green">#1CC50F</color>
     <color name="grey_20">#cccccc</color>
     <color name="grey_80">#37474F</color>
+
+    <color name="dark_red">#ba000d</color>
+    <color name="rose">#f50057</color>
+    <color name="purple">#7b1fa2</color>
+    <color name="blue">#303f9f</color>
+    <color name="lightBlue">#039be5</color>
+    <color name="light_green">#64dd17</color>
+    <color name="yellow">#ffea00</color>
+    <color name="orange">#ff9100</color>
+    <color name="brown">#40241a</color>
+    <color name="grey">#616161</color>
+    <color name="blue_grey">#455a64</color>
+    <color name="light_grey">#aeaeae</color>
+    <color name="lime">#c6ff00</color>
+    <color name="turquoise">#69f0ae</color>
+    <color name="pink">#ff80ab</color>
+    <color name="tangerine">#ff5722</color>
+    <!--#101D2A-->
 </resources>

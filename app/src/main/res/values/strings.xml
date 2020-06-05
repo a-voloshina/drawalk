@@ -25,4 +25,10 @@
     <string name="save">Сохранить</string>
     <string name="dialog_toolbar_title">Сохранить результат</string>
     <string name="share">Поделиться</string>
+    <string name="settings">settings</string>
+    <string name="choose_line_color">Выберите цвет линии</string>
+    <string name="choose_line_width">Выберите толщину линии</string>
+    <string name="choose_color">Выбрать цвет</string>
+    <string name="start">Старт</string>
+    <string name="finish">Финиш</string>
 </resources>
