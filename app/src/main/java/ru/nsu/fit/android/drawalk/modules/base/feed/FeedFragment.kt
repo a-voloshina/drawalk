@@ -5,6 +5,7 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +17,8 @@ abstract class FeedFragment<T: Parcelable>(layoutId: Int = R.layout.fragment_fee
     protected val data = mutableListOf<T?>()
     protected lateinit var adapter: AutoLoadingRecyclerAdapter<T, RecyclerView.ViewHolder>
     private lateinit var recyclerView: RecyclerView
+    private lateinit var noDataTextView: TextView
+    protected open val noDataText: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,6 +40,11 @@ abstract class FeedFragment<T: Parcelable>(layoutId: Int = R.layout.fragment_fee
                 }
             }
             it.adapter = adapter
+        }
+
+        noDataTextView = view.findViewById(R.id.no_data_text)
+        noDataText?.let {
+            noDataTextView.text = it
         }
 
         if (savedInstanceState != null) {
@@ -95,6 +103,10 @@ abstract class FeedFragment<T: Parcelable>(layoutId: Int = R.layout.fragment_fee
     protected abstract fun providePresenter(view: IFeedFragment<T>, data: List<T?>): IFeedPresenter
 
     override fun setDataCapacity(cap: Int?) {
+        if (cap == 0) {
+            recyclerView.visibility = View.GONE
+            noDataTextView.visibility = View.VISIBLE
+        }
         adapter.dataCapacity = cap
     }
 }

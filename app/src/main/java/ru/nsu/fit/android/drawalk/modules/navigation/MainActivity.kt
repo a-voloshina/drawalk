@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,12 +20,12 @@ import androidx.navigation.ui.setupWithNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ActivityMainBinding
 import ru.nsu.fit.android.drawalk.modules.example.ExampleActivity
+import ru.nsu.fit.android.drawalk.modules.profile.MyProfileActivity
 import ru.nsu.fit.android.drawalk.utils.FirebaseHolder
 
 class MainActivity : AppCompatActivity() {
@@ -34,25 +35,25 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
+        toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
-        val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_arts, R.id.nav_users
+                R.id.nav_arts, R.id.nav_users, R.id.nav_my_arts
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        binding.navView.setupWithNavController(navController)
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
         fab.setOnClickListener { view ->
@@ -60,13 +61,21 @@ class MainActivity : AppCompatActivity() {
                 .setAction("Action", null).show()
             startActivity(Intent(this, ExampleActivity::class.java))
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
         updateUIForUser()
     }
 
     private fun updateUIForUser() {
         val currentUser = FirebaseHolder.AUTH.currentUser
         val navView = binding.navView
+        val authenticated = currentUser != null
+
+        navView.menu.setGroupVisible(R.id.authed_drawer, authenticated)
+        toolbar.menu.setGroupVisible(R.id.authed_main_menu, authenticated)
+
         navView.removeHeaderView(navView.getHeaderView(0))
         if (currentUser == null) {
             val header = navView.inflateHeaderView(R.layout.nav_header_main_unauthorized)
@@ -79,6 +88,9 @@ class MainActivity : AppCompatActivity() {
                         .build(), RC_SIGN_IN
                 )
             }
+            if (navView.checkedItem?.groupId == R.id.authed_drawer) {
+                navView.setCheckedItem(R.id.nav_arts)
+            }
         } else {
             FirebaseHolder.tryToAddNewUserData(
                 currentUser.uid,
@@ -86,6 +98,9 @@ class MainActivity : AppCompatActivity() {
                 currentUser.photoUrl?.toString()
             )
             val header = navView.inflateHeaderView(R.layout.nav_header_main_authorized)
+            header.setOnClickListener {
+                startActivity(Intent(this, MyProfileActivity::class.java))
+            }
             header.findViewById<Button>(R.id.sign_out).setOnClickListener {
                 AuthUI.getInstance()
                     .signOut(this)
@@ -93,7 +108,8 @@ class MainActivity : AppCompatActivity() {
                         updateUIForUser()
                     }
             }
-            header.findViewById<TextView>(R.id.user_name).text = currentUser.displayName
+            val username = header.findViewById<TextView>(R.id.user_name)
+            username.text = currentUser.displayName
             header.findViewById<TextView>(R.id.user_email).text = currentUser.email
             val avatar = header.findViewById<ImageView>(R.id.imageView)
             Picasso.get().load(currentUser.photoUrl).into(avatar)
@@ -106,7 +122,9 @@ class MainActivity : AppCompatActivity() {
             updateUIForUser()
             if (resultCode != Activity.RESULT_OK) {
                 val response = IdpResponse.fromResultIntent(data)
-                Toast.makeText(this, response?.error?.message ?: "NULL", Toast.LENGTH_LONG).show()
+                response?.error?.errorCode?.let {
+                    Toast.makeText(this, getString(R.string.sing_in_error), Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -114,6 +132,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_profile_settings -> {
+            startActivity(Intent(this, MyProfileActivity::class.java))
+            true
+        }
+        R.id.action_about -> {
+            Toast.makeText(this, "Show about", Toast.LENGTH_SHORT).show()
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {

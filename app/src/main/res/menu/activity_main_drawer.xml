@@ -4,13 +4,21 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_arts"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/arts_feed"/>
-        <item
-            android:id="@+id/nav_users"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/users_feed"/>
+        <group>
+            <item
+                android:id="@+id/nav_arts"
+                android:icon="@drawable/ic_menu_gallery"
+                android:title="@string/arts_feed"/>
+            <item
+                android:id="@+id/nav_users"
+                android:icon="@drawable/ic_menu_camera"
+                android:title="@string/users_feed"/>
+        </group>
+        <group android:id="@+id/authed_drawer"
+            android:visible="false">
+            <item
+                android:id="@+id/nav_my_arts"
+                android:title="@string/my_arts"/>
+        </group>
     </group>
 </menu>

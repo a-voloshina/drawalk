@@ -19,6 +19,10 @@ class ExampleFragment: IExampleFragment(R.layout.fragment_example) {
         return binding.root
     }
 
+    override fun showError(cause: Throwable) {
+
+    }
+
     override fun setExampleText(text: String) {
         binding.mainText.text = text
     }

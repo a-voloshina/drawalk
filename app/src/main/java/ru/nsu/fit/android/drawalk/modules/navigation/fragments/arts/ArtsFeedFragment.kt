@@ -1,20 +1,21 @@
 package ru.nsu.fit.android.drawalk.modules.navigation.fragments.arts
 
+import android.content.Intent
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ItemArtBinding
 import ru.nsu.fit.android.drawalk.model.GpsArtData
+import ru.nsu.fit.android.drawalk.modules.artdetails.ArtDetailsActivity
 import ru.nsu.fit.android.drawalk.modules.base.feed.FeedFragment
 import ru.nsu.fit.android.drawalk.modules.base.feed.IFeedFragment
 import ru.nsu.fit.android.drawalk.modules.base.feed.adapter.AutoLoadingRecyclerAdapter
 
-class ArtsFeedFragment: FeedFragment<GpsArtData>() {
+open class ArtsFeedFragment: FeedFragment<GpsArtData>() {
     inner class ArtsFeedAdapter(recyclerView: RecyclerView, data: List<GpsArtData?>) :
         AutoLoadingRecyclerAdapter<GpsArtData, RecyclerView.ViewHolder>(recyclerView, data) {
         inner class ArtViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -42,7 +43,8 @@ class ArtsFeedFragment: FeedFragment<GpsArtData>() {
                 ?: throw RuntimeException("Wrong holder type")
             val binding = artHolder.binding
             binding.root.setOnClickListener {
-                Toast.makeText(activity, "Picked art with ID ${item.id}", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(activity, ArtDetailsActivity::class.java)
+                    .putExtra(ArtDetailsActivity.ART_ID_EXTRA, item.id))
             }
             binding.txtName.text = item.name
             binding.txtAuthorName.text = item.authorName
@@ -64,6 +66,8 @@ class ArtsFeedFragment: FeedFragment<GpsArtData>() {
             }
         }
     }
+
+    override val noDataText by lazy { getString(R.string.no_arts_text) }
 
     override fun provideAdapter(view: RecyclerView, data: List<GpsArtData?>) = ArtsFeedAdapter(view, data)
 

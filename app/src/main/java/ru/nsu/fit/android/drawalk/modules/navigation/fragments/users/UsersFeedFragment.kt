@@ -1,7 +1,7 @@
 package ru.nsu.fit.android.drawalk.modules.navigation.fragments.users
 
+import android.content.Intent
 import android.view.View
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ItemUserBinding
@@ -9,6 +9,7 @@ import ru.nsu.fit.android.drawalk.model.firebase.UserData
 import ru.nsu.fit.android.drawalk.modules.base.feed.FeedFragment
 import ru.nsu.fit.android.drawalk.modules.base.feed.IFeedFragment
 import ru.nsu.fit.android.drawalk.modules.base.feed.adapter.AutoLoadingRecyclerAdapter
+import ru.nsu.fit.android.drawalk.modules.user.UserActivity
 
 class UsersFeedFragment: FeedFragment<UserData>() {
     inner class UsersFeedAdapter(recyclerView: RecyclerView, data: List<UserData?>) :
@@ -30,10 +31,13 @@ class UsersFeedFragment: FeedFragment<UserData>() {
             binding.txtId.text = item.id
             binding.txtName.text = item.name
             binding.root.setOnClickListener {
-                Toast.makeText(activity, "Picked user with ID ${item.id}", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(activity, UserActivity::class.java)
+                    .putExtra(UserActivity.USER_ID_EXTRA, item.id))
             }
         }
     }
+
+    override val noDataText by lazy { getString(R.string.no_users_text) }
 
     override fun provideAdapter(view: RecyclerView, data: List<UserData?>) = UsersFeedAdapter(view, data)
 

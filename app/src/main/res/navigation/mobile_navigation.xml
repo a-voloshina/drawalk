@@ -16,4 +16,10 @@
         android:name="ru.nsu.fit.android.drawalk.modules.navigation.fragments.users.UsersFeedFragment"
         android:label="@string/users_feed"
         tools:layout="@layout/fragment_feed"/>
+
+    <fragment
+        android:id="@+id/nav_my_arts"
+        android:name="ru.nsu.fit.android.drawalk.modules.navigation.fragments.myarts.MyArtsFeedFragment"
+        android:label="@string/my_arts"
+        tools:layout="@layout/fragment_feed"/>
 </navigation>

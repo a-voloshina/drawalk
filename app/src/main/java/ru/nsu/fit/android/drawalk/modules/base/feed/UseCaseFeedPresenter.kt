@@ -1,6 +1,6 @@
 package ru.nsu.fit.android.drawalk.modules.base.feed
 
-import ru.nsu.fit.android.drawalk.common.UseCase
+import ru.nsu.fit.android.drawalk.usecase.UseCase
 
 abstract class UseCaseFeedPresenter<T : Any>(
     private val view: IFeedFragment<T>,
