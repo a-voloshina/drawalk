@@ -121,6 +121,7 @@ class MainActivity : AppCompatActivity() {
                 val response = IdpResponse.fromResultIntent(data)
                 response?.error?.errorCode?.let {
                     Toast.makeText(this, getString(R.string.sing_in_error), Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, response.error.toString(), Toast.LENGTH_LONG).show()
                 }
             }
         }
