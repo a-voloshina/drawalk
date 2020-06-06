@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.model.MapPoint
+import ru.nsu.fit.android.drawalk.model.MapSegment
 import ru.nsu.fit.android.drawalk.modules.base.loading.AsynchronousWorkActivity
 import java.io.File
 import java.io.FileOutputStream
