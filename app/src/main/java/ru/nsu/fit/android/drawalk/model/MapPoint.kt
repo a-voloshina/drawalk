@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.modules.map
+package ru.nsu.fit.android.drawalk.model
 
 import com.google.android.gms.maps.model.LatLng
 

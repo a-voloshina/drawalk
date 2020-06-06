@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.modules.base
+package ru.nsu.fit.android.drawalk.modules.base.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

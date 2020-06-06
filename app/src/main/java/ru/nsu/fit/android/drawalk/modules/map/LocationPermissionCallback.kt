@@ -6,9 +6,9 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import ru.nsu.fit.android.drawalk.R
-import ru.nsu.fit.android.drawalk.modules.permission.OnPermissionCallback
-import ru.nsu.fit.android.drawalk.modules.permission.PermissionHelper
-import ru.nsu.fit.android.drawalk.modules.permission.PermissionResultHandler
+import ru.nsu.fit.android.drawalk.utils.permission.OnPermissionCallback
+import ru.nsu.fit.android.drawalk.utils.permission.PermissionHelper
+import ru.nsu.fit.android.drawalk.utils.permission.PermissionResultHandler
 
 class LocationPermissionCallback(
     private val context: Activity,

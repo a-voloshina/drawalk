@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.modules.animation
+package ru.nsu.fit.android.drawalk.modules.map
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter

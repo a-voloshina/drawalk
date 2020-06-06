@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.modules.base
+package ru.nsu.fit.android.drawalk.modules.base.loading
 
 interface AsynchronousWorkActivity {
     fun startProgressBar()

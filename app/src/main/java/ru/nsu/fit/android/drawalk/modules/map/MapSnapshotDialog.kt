@@ -27,7 +27,7 @@ class MapSnapshotDialog(private val imageUri: Uri) : DialogFragment() {
             val width = ViewGroup.LayoutParams.MATCH_PARENT
             val height = ViewGroup.LayoutParams.MATCH_PARENT
             dialog.window?.setLayout(width, height)
-            dialog.window?.setWindowAnimations(R.style.AppTheme_Slide)
+//            dialog.window?.setWindowAnimations(R.style.AppTheme_Slide) TODO: slide style
         }
     }
 

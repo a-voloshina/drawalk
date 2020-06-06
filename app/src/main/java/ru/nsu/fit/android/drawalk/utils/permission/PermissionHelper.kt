@@ -1,10 +1,10 @@
-package ru.nsu.fit.android.drawalk.modules.permission
+package ru.nsu.fit.android.drawalk.utils.permission
 
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
-import ru.nsu.fit.android.drawalk.modules.common.DraWalkApplication
+import ru.nsu.fit.android.drawalk.DraWalkApplication
 
 class PermissionHelper(
     private val onPermissionCallback: OnPermissionCallback,

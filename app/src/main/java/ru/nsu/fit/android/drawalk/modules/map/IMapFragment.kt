@@ -2,9 +2,9 @@ package ru.nsu.fit.android.drawalk.modules.map
 
 import com.google.android.gms.maps.model.LatLng
 import ru.nsu.fit.android.drawalk.modules.base.IViewFragment
-import ru.nsu.fit.android.drawalk.modules.permission.PermissionResultHandler
+import ru.nsu.fit.android.drawalk.utils.permission.PermissionResultHandler
 
-abstract class IMapFragment : IViewFragment<IMapPresenter>(), PermissionResultHandler,
+abstract class IMapFragment(layoutId: Int) : IViewFragment<IMapPresenter>(layoutId), PermissionResultHandler,
     OnGPSCheckingListener {
 
     abstract fun addMarker(position: LatLng, title: String)

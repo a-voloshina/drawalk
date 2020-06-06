@@ -20,11 +20,10 @@ import androidx.navigation.ui.setupWithNavController
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.IdpResponse
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ActivityMainBinding
-import ru.nsu.fit.android.drawalk.modules.example.ExampleActivity
+import ru.nsu.fit.android.drawalk.modules.map.MapActivity
 import ru.nsu.fit.android.drawalk.modules.profile.MyProfileActivity
 import ru.nsu.fit.android.drawalk.utils.FirebaseHolder
 
@@ -56,10 +55,8 @@ class MainActivity : AppCompatActivity() {
         binding.navView.setupWithNavController(navController)
 
         val fab: FloatingActionButton = findViewById(R.id.fab)
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Will open art creation", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-            startActivity(Intent(this, ExampleActivity::class.java))
+        fab.setOnClickListener {
+            startActivity(Intent(this, MapActivity::class.java))
         }
     }
 

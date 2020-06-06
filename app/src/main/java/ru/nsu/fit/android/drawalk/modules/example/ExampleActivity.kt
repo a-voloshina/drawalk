@@ -2,7 +2,7 @@ package ru.nsu.fit.android.drawalk.modules.example
 
 import android.os.Bundle
 import ru.nsu.fit.android.drawalk.databinding.ActivityExampleBinding
-import ru.nsu.fit.android.drawalk.modules.base.SingleFragmentActivity
+import ru.nsu.fit.android.drawalk.modules.base.activity.SingleFragmentActivity
 import ru.nsu.fit.android.drawalk.utils.FirebaseHolder
 
 class ExampleActivity: SingleFragmentActivity() {

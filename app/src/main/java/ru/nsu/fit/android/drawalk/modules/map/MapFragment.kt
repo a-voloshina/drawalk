@@ -14,9 +14,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -32,11 +30,12 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import ru.nsu.fit.android.drawalk.R
-import ru.nsu.fit.android.drawalk.modules.base.AsynchronousWorkActivity
+import ru.nsu.fit.android.drawalk.model.MapPoint
+import ru.nsu.fit.android.drawalk.modules.base.loading.AsynchronousWorkActivity
 import java.io.File
 import java.io.FileOutputStream
 
-class MapFragment : IMapFragment(), OnMapReadyCallback, MapDrawingSettingsListener {
+class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, MapDrawingSettingsListener {
 
     companion object {
         const val REQUEST_CHECK_SETTINGS = 128
@@ -81,18 +80,6 @@ class MapFragment : IMapFragment(), OnMapReadyCallback, MapDrawingSettingsListen
 
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return if (view == null) {
-            inflater.inflate(R.layout.fragment_map, container, false)
-        } else {
-            view
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getMap()
@@ -118,6 +105,10 @@ class MapFragment : IMapFragment(), OnMapReadyCallback, MapDrawingSettingsListen
             addAction(Intent.ACTION_PROVIDER_CHANGED)
         }
         myActivity.registerReceiver(gpsSwitchStateReceiver, filter)
+    }
+
+    override fun showError(cause: Throwable) {
+        Toast.makeText(activity, cause.message, Toast.LENGTH_LONG).show()
     }
 
     private fun getMap() {

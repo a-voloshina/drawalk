@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.modules.common
+package ru.nsu.fit.android.drawalk.utils
 
 import android.content.Context
 import android.content.SharedPreferences

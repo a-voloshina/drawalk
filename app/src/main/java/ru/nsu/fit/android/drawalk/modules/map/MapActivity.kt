@@ -10,11 +10,11 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ActivityMapBinding
-import ru.nsu.fit.android.drawalk.modules.animation.ViewAnimation
-import ru.nsu.fit.android.drawalk.modules.base.AsynchronousWorkActivity
-import ru.nsu.fit.android.drawalk.modules.base.SingleFragmentActivity
+import ru.nsu.fit.android.drawalk.modules.base.activity.SingleFragmentActivity
+import ru.nsu.fit.android.drawalk.modules.base.loading.AsynchronousWorkActivity
 
-class MapActivity : SingleFragmentActivity(), AsynchronousWorkActivity {
+class MapActivity : SingleFragmentActivity(),
+    AsynchronousWorkActivity {
     private lateinit var binding: ActivityMapBinding
     private lateinit var view: IMapFragment
 

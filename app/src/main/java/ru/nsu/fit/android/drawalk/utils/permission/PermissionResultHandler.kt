@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.modules.permission
+package ru.nsu.fit.android.drawalk.utils.permission
 
 interface PermissionResultHandler {
     fun handleSuccessfullyGetPermission()
