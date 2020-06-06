@@ -32,7 +32,7 @@ class ArtDetailsActivity : IArtDetailsActivity() {
     private lateinit var authorName: TextView
     private lateinit var created: TextView
 
-    private lateinit var authorId: String
+    private var authorId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +45,7 @@ class ArtDetailsActivity : IArtDetailsActivity() {
         created = findViewById(R.id.txt_created)
         authorName = findViewById(R.id.txt_author_name)
         authorName.setOnClickListener {
-            if (this::authorId.isInitialized) {
+            if (authorId != null) {
                 startActivity(
                     Intent(this, UserActivity::class.java)
                         .putExtra(UserActivity.USER_ID_EXTRA, authorId)
@@ -81,20 +81,18 @@ class ArtDetailsActivity : IArtDetailsActivity() {
         finish()
     }
 
-    override fun onResume() {
-        super.onResume()
-        updateUIForUser()
-    }
-
-    private fun updateUIForUser() {
-        val currentUser = FirebaseHolder.AUTH.currentUser
-        toolbar.menu.setGroupVisible(R.id.authed_art_menu, currentUser != null) //TODO: bug, doesn't work
-        Toast.makeText(this, "${currentUser != null}", Toast.LENGTH_SHORT).show()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.art, menu)
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        menu?.let {
+            val currentUserId = FirebaseHolder.AUTH.currentUser?.uid
+            val youAreAuthor = currentUserId != null && authorId == currentUserId
+            it.setGroupVisible(R.id.authed_art_menu, youAreAuthor)
+        }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
@@ -131,6 +129,7 @@ class ArtDetailsActivity : IArtDetailsActivity() {
     }
 
     override fun showError(cause: Throwable) {
+        stopLoading()
         Toast.makeText(this, "Error: ${cause.message}", Toast.LENGTH_LONG).show()
     }
 
