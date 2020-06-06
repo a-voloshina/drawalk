@@ -54,4 +54,33 @@
     <string name="delete_account_dialog_title">Account deletion</string>
     <string name="user_activity_label">User info</string>
     <string name="my_profile_activity_label">Profile settings</string>
+
+    <string name="allow">Разрешить</string>
+    <string name="decline">Отклонить</string>
+    <string name="explanation_dialog_title">Доступ к данным</string>
+    <string name="explanation_dialog_message">Чтобы продолжить необходимо разрешение на получение информации о местоположении.
+        Это разрешение требуется для того,
+        чтобы рисовать маршрут на основе вашей геолокации. Разрешить доступ к данным? </string>
+    <string name="really_need_explanation_dialog_message">Чтобы продолжить необходимо разрешение на получение информации о местоположении.
+        Это разрешение требуется для того,
+        чтобы рисовать маршрут на основе вашей геолокации. Разрешить доступ к данным? </string>
+    <string name="permission_denied">Отказано в разрешении</string>
+    <string name="gps_explanation_dialog_message">Для продолжения необходимо получение данных о местоположении.
+    Включить GPS?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="gps_explanation_message">Для получения данных о местоположении необходимо подключение к GPS.</string>
+    <string name="turn_on">ВКЛЮЧИТЬ</string>
+    <string name="warning_yellow_triangle">warning_yellow_triangle</string>
+    <string name="map_snapshot_view">map_snapshot_view</string>
+    <string name="image_uri">Image uri</string>
+    <string name="save">Сохранить</string>
+    <string name="dialog_toolbar_title">Сохранить результат</string>
+    <string name="share">Поделиться</string>
+    <string name="settings">settings</string>
+    <string name="choose_line_color">Выберите цвет линии</string>
+    <string name="choose_line_width">Выберите толщину линии</string>
+    <string name="choose_color">Выбрать цвет</string>
+    <string name="start">Старт</string>
+    <string name="finish">Финиш</string>
 </resources>
