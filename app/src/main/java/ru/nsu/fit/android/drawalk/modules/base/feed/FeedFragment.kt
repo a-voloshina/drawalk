@@ -64,12 +64,14 @@ abstract class FeedFragment<T: Parcelable>(layoutId: Int = R.layout.fragment_fee
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val position = (recyclerView.layoutManager as LinearLayoutManager)
-            .findFirstVisibleItemPosition()
-        outState.putParcelableArrayList("data", ArrayList(data))
-        outState.putInt("position", position)
-        adapter.dataCapacity?.let {
-            outState.putInt("capacity", it)
+        if (this::recyclerView.isInitialized && this::adapter.isInitialized) {
+            val position = (recyclerView.layoutManager as LinearLayoutManager)
+                .findFirstVisibleItemPosition()
+            outState.putParcelableArrayList("data", ArrayList(data))
+            outState.putInt("position", position)
+            adapter.dataCapacity?.let {
+                outState.putInt("capacity", it)
+            }
         }
     }
 

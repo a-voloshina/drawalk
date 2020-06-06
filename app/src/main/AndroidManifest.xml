@@ -10,16 +10,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".modules.artdetails.ArtDetailsActivity" />
-        <activity android:name=".modules.profile.MyProfileActivity" />
-        <activity android:name=".modules.user.UserActivity" />
-        <activity android:name=".modules.navigation.MainActivity">
+        <activity
+            android:name=".modules.navigation.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".modules.artdetails.ArtDetailsActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".modules.user.UserActivity"
+            android:label="@string/user_activity_label"/>
+        <activity
+            android:name=".modules.profile.MyProfileActivity"
+            android:label="@string/my_profile_activity_label"/>
+
         <activity android:name=".modules.example.ExampleActivity" />
     </application>
 

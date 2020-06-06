@@ -52,4 +52,6 @@
     <string name="enter_new_art_name">Enter new art name:</string>
     <string name="new_art_name_hint">Art name</string>
     <string name="delete_account_dialog_title">Account deletion</string>
+    <string name="user_activity_label">User info</string>
+    <string name="my_profile_activity_label">Profile settings</string>
 </resources>

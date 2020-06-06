@@ -5,7 +5,7 @@ import ru.nsu.fit.android.drawalk.model.GpsArtData
 import ru.nsu.fit.android.drawalk.modules.base.feed.IFeedFragment
 import ru.nsu.fit.android.drawalk.modules.navigation.fragments.arts.ArtsFeedFragment
 
-open class UserArtsFeedFragment(private val userId: String?): ArtsFeedFragment() {
+open class UserArtsFeedFragment(private val userId: String? = null): ArtsFeedFragment() {
     override fun providePresenter(
         view: IFeedFragment<GpsArtData>,
         data: List<GpsArtData?>
