@@ -25,41 +25,40 @@ abstract class FeedFragment<T: Parcelable>(layoutId: Int = R.layout.fragment_fee
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
-        recyclerView = view!!.findViewById<RecyclerView>(R.id.recycler_view).also {
-            it.layoutManager = LinearLayoutManager(activity)
-            adapter = provideAdapter(
-                it,
-                data
-            ).also { adapter ->
-                adapter.loadMoreListener = object :
-                    OnLoadMoreListener {
-                    override fun onLoadMore() {
-                        presenter.loadMoreData()
-                    }
-                }
-            }
-            it.adapter = adapter
-        }
-
-        noDataTextView = view.findViewById(R.id.no_data_text)
-        noDataText?.let {
-            noDataTextView.text = it
-        }
-
-        if (savedInstanceState != null) {
-            savedInstanceState.getParcelableArrayList<T?>("data")?.let {
-                data.clear()
-                data.addAll(it)
-            }
-            recyclerView.scrollToPosition(savedInstanceState.getInt("position"))
-            adapter.dataCapacity = savedInstanceState.get("capacity") as? Int?
-        }
-
         presenter = providePresenter(this, data)
         presenter.getDataCapacity()
 
-        return view
+        return super.onCreateView(inflater, container, savedInstanceState)?.also { view ->
+            recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view).also {
+                it.layoutManager = LinearLayoutManager(activity)
+                adapter = provideAdapter(
+                    it,
+                    data
+                ).also { adapter ->
+                    adapter.loadMoreListener = object :
+                        OnLoadMoreListener {
+                        override fun onLoadMore() {
+                            presenter.loadMoreData()
+                        }
+                    }
+                }
+                it.adapter = adapter
+            }
+
+            noDataTextView = view.findViewById(R.id.no_data_text)
+            noDataText?.let {
+                noDataTextView.text = it
+            }
+
+            if (savedInstanceState != null) {
+                savedInstanceState.getParcelableArrayList<T?>("data")?.let {
+                    data.clear()
+                    data.addAll(it)
+                }
+                recyclerView.scrollToPosition(savedInstanceState.getInt("position"))
+                adapter.dataCapacity = savedInstanceState.get("capacity") as? Int?
+            }
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
