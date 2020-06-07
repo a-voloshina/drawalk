@@ -1,7 +1,5 @@
 package ru.nsu.fit.android.drawalk.modules.map
 
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
@@ -84,25 +82,6 @@ class MapActivity : SingleFragmentActivity(),
 
             return@setOnLongClickListener true
         }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == LocationPermissionCallback.LOCATION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //view.handleSuccessfullyGetPermission()
-                startLocationService()
-            }
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        }
-    }
-
-    private fun startLocationService() {
-        startService(Intent(this, LocationService::class.java))  //TODO: или поместить в сервис или выпилить его
     }
 
     override fun startProgressBar() {

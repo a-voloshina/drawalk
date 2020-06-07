@@ -1,5 +1,6 @@
 package ru.nsu.fit.android.drawalk.modules.map
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,21 +9,28 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.DialogMapSnapshotBinding
+import ru.nsu.fit.android.drawalk.model.MapSegment
 
 class MapSnapshotDialog : DialogFragment() {
     companion object {
-        private const val INSTANCE_MESSAGE_KEY = "arguments for MapSnapshotDialog"
+        private const val URI_INSTANCE_MESSAGE_KEY = "image uri argument for MapSnapshotDialog"
+        private const val BITMAP_INSTANCE_MESSAGE_KEY = "image bitmap argument for MapSnapshotDialog"
+        private const val POINTS_INSTANCE_MESSAGE_KEY = "image points argument for MapSnapshotDialog"
 
-        fun newInstance(imageUri: Uri): DialogFragment {
+        fun newInstance(imageUri: Uri, imageBitmap: Bitmap, points: ArrayList<MapSegment>): DialogFragment {
             return MapSnapshotDialog().apply {
                 val arguments = Bundle()
-                arguments.putParcelable(INSTANCE_MESSAGE_KEY, imageUri)
+                arguments.putParcelable(URI_INSTANCE_MESSAGE_KEY, imageUri)
+                arguments.putParcelable(BITMAP_INSTANCE_MESSAGE_KEY, imageBitmap)
+                arguments.putParcelableArrayList(POINTS_INSTANCE_MESSAGE_KEY, points)
                 setArguments(arguments)
             }
         }
     }
 
     private lateinit var imageUri: Uri
+    private lateinit var imageBitmap: Bitmap
+    private lateinit var imagePoints: ArrayList<MapSegment>
     private lateinit var binding: DialogMapSnapshotBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,15 +64,28 @@ class MapSnapshotDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //binding.description.text = imageUri.toString()
-        imageUri = arguments?.getParcelable(INSTANCE_MESSAGE_KEY)
-            ?: throw Exception("no arguments received in MapSnapshotDialog")
+        imageUri = arguments?.getParcelable(URI_INSTANCE_MESSAGE_KEY)
+            ?: throw Exception("no Uri argument received in MapSnapshotDialog")
+        imageBitmap = arguments?.getParcelable(BITMAP_INSTANCE_MESSAGE_KEY)
+            ?: throw Exception("no Bitmap arguments received in MapSnapshotDialog")
+        imagePoints = arguments?.getParcelableArrayList(POINTS_INSTANCE_MESSAGE_KEY)
+            ?: throw Exception("no ArrayList argument received in MapSnapshotDialog")
         binding.mapImage.setImageURI(imageUri)
         binding.toolbar.setNavigationOnClickListener { dismiss() }
         binding.toolbar.setTitle(R.string.dialog_toolbar_title)
-        binding.toolbar.inflateMenu(R.menu.menu_map)
-        binding.toolbar.setOnMenuItemClickListener {
-            dismiss()                           //TODO: save at storage
-            return@setOnMenuItemClickListener true
+        //binding.toolbar.inflateMenu(R.menu.menu_map)
+//        binding.toolbar.setOnMenuItemClickListener {
+//            dismiss()
+//            return@setOnMenuItemClickListener true
+//        }
+        binding.saveButton.setOnClickListener {
+            saveArt()
+            dismiss()
         }
+    }
+
+    //TODO: save at storage
+    private fun saveArt(){
+
     }
 }
