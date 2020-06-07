@@ -27,7 +27,7 @@
     <string name="no_data_placeholder">Нет данных</string>
     <string name="no_arts_text">Пока нет ни одного арта</string>
     <string name="no_users_text">Не удалось найти ни одного пользователя</string>
-    <string name="no_user_arts_text">User have no arts</string>
+    <string name="no_user_arts_text">У пользователя нет артов</string>
     <string name="no_my_arts_text">У вас пока нет артов, создайте один (кнопка с картой)!</string>
     <string name="date_time_placeholder">01.01.2020 00:00</string>
     <string name="action_rename_art">Переименовать арт</string>
@@ -44,7 +44,7 @@
     <string name="ok">OK</string>
     <string name="enter_new_art_name">Введите новое название арта:</string>
     <string name="new_art_name_hint">Название</string>
-    <string name="delete_account_dialog_title">Account deletion</string>
+    <string name="delete_account_dialog_title">Удаление аккаунта</string>
     <string name="user_activity_label">Данные пользователя</string>
     <string name="my_profile_activity_label">Настройки профиля</string>
 
