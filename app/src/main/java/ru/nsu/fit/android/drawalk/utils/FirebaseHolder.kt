@@ -15,6 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.UploadTask
 import com.google.firebase.storage.ktx.storage
 import ru.nsu.fit.android.drawalk.model.GpsArtData
+import ru.nsu.fit.android.drawalk.model.MapSegment
 import ru.nsu.fit.android.drawalk.model.firebase.ArtPolyLine
 import ru.nsu.fit.android.drawalk.model.firebase.GpsArt
 import ru.nsu.fit.android.drawalk.model.firebase.PointSettings
@@ -50,10 +51,11 @@ object FirebaseHolder {
                     id, id, "name ${SecureRandom().nextInt(1000)}", listOf(
                         ArtPolyLine(
                             listOf(
-                                GeoPoint(0.0, 0.0),
-                                GeoPoint(1.0, 1.0)
+                                GeoPoint(1.0, 2.0),
+                                GeoPoint(3.0, 4.0),
+                                GeoPoint(0.0, 5.0)
                             ),
-                            PointSettings(0, 5.0)
+                            PointSettings(-1, 10.0)
                         )
                     ), Timestamp.now(),
                     SecureRandom().nextInt(5).let {
@@ -267,7 +269,7 @@ object FirebaseHolder {
      *
      * @param preview art preview image
      * @param name art name
-     * @param polylines art polylines
+     * @param segments art polylines
      * @param onSuccess success callback, gets ID of created art
      * @param onError error callback
      * @param compressionQuality JPEG compression quality (0-100), 0 - small size, 100 - high quality
@@ -276,7 +278,7 @@ object FirebaseHolder {
     fun createNewArt(
         preview: Bitmap,
         name: String,
-        polylines: List<ArtPolyLine>,
+        segments: List<MapSegment>,
         onSuccess: (String) -> Unit = {},
         onError: (Exception) -> Unit = {},
         compressionQuality: Int = 100
@@ -290,7 +292,7 @@ object FirebaseHolder {
         return uploadImage(
             preview, artId,
             { uri ->
-                val gpsArt = GpsArt(artId, userId, name, polylines, previewUrl = uri.toString())
+                val gpsArt = GpsArt(artId, userId, name, segments.map(::ArtPolyLine), previewUrl = uri.toString())
                 ARTS.document(artId).set(gpsArt).addOnFailureListener(onError)
                     .addOnSuccessListener {
                         onSuccess(artId)

@@ -23,6 +23,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.squareup.picasso.Picasso
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ActivityMainBinding
+import ru.nsu.fit.android.drawalk.modules.example.ExampleActivity
 import ru.nsu.fit.android.drawalk.modules.map.MapActivity
 import ru.nsu.fit.android.drawalk.modules.profile.MyProfileActivity
 import ru.nsu.fit.android.drawalk.utils.FirebaseHolder
@@ -138,6 +139,10 @@ class MainActivity : AppCompatActivity() {
         }
         R.id.action_about -> {
             Toast.makeText(this, "Show about", Toast.LENGTH_SHORT).show()
+            true
+        }
+        R.id.action_example -> {
+            startActivity(Intent(this, ExampleActivity::class.java))
             true
         }
         else -> super.onOptionsItemSelected(item)

@@ -12,14 +12,21 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.PolylineOptions
 import ru.nsu.fit.android.drawalk.R
+import ru.nsu.fit.android.drawalk.model.firebase.ArtPolyLine
 import ru.nsu.fit.android.drawalk.model.firebase.GpsArt
 import ru.nsu.fit.android.drawalk.modules.user.UserActivity
 import ru.nsu.fit.android.drawalk.utils.FirebaseHolder
+import ru.nsu.fit.android.drawalk.utils.MapUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ArtDetailsActivity : IArtDetailsActivity() {
+class ArtDetailsActivity : IArtDetailsActivity(), OnMapReadyCallback {
     companion object {
         const val ART_ID_EXTRA = "ART_ID_EXTRA"
     }
@@ -31,8 +38,10 @@ class ArtDetailsActivity : IArtDetailsActivity() {
     private lateinit var name: TextView
     private lateinit var authorName: TextView
     private lateinit var created: TextView
+    private lateinit var map: GoogleMap
 
     private var authorId: String? = null
+    private var currentArt: List<ArtPolyLine>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +69,18 @@ class ArtDetailsActivity : IArtDetailsActivity() {
 
         val artId = intent.getStringExtra(ART_ID_EXTRA)
         presenter = ArtDetailsPresenter(this, artId)
+
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map_fragment)
+        if (mapFragment != null) {
+            (mapFragment as SupportMapFragment).getMapAsync(this)
+        } else {
+            throw Exception("null map fragment")
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap?) {
+        map = googleMap ?: throw Exception("got null GoogleMap in onMapReady")
+        drawArt()
     }
 
     override fun updateArtData(art: GpsArt, username: String) {
@@ -68,7 +89,23 @@ class ArtDetailsActivity : IArtDetailsActivity() {
         this.authorName.text = username
         this.created.text = SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.ENGLISH)
             .format(art.created.toDate())
-        //TODO: initialize map with data.parts
+        currentArt = art.parts
+        drawArt()
+    }
+
+    private fun drawArt() {
+        val segments = currentArt?.map(ArtPolyLine::toMapSegment)
+        if (this::map.isInitialized && segments != null) {
+            map.clear()
+            for (segment in segments) {
+                map.addPolyline(PolylineOptions()
+                    .addAll(segment.coordinates)
+                    .color(segment.color)
+                    .width(segment.width))
+            }
+            map.moveCamera(CameraUpdateFactory
+                .newLatLngBounds(MapUtils.getBounds(segments), 5))
+        }
     }
 
     override fun updateArtName(name: String) {
