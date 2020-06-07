@@ -25,7 +25,7 @@
     <string name="user_email_placeholder">user@email.com</string>
     <string name="delete_account">Delete account</string>
     <string name="submit">Submit</string>
-    <string name="cancel">Cancel</string>
+    <string name="cancel">Отменить</string>
     <string name="loading_placeholder">Loading, please wait…</string>
     <string name="loading_updating_username">Updating username…</string>
     <string name="loading_deleting_app_data">Deleting application user data…</string>
@@ -83,4 +83,9 @@
     <string name="choose_color">Выбрать цвет</string>
     <string name="start">Старт</string>
     <string name="finish">Финиш</string>
+    <string name="create_art">Создать рисунок</string>
+    <string name="accept">Принять</string>
+    <string name="erase_art_question">Стереть рисунок?</string>
+    <string name="erase_art_description">Вы уверены, что хотите сбросить рисунок? Эта операция не может быть отменена.</string>
+    <string name="enter_art_name">Введите название арта…</string>
 </resources>

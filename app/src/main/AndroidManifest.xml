@@ -33,12 +33,12 @@
             android:label="@string/my_profile_activity_label"/>
         <activity
             android:name=".modules.map.MapActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/create_art"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBBRIWPRc787MWeGMOv1DFKjXyshLi1yPs"/>
-        <service android:name=".modules.map.LocationService" />
+            android:value="${googleMapsKey}"/>
 
         <activity android:name=".modules.example.ExampleActivity" />
     </application>

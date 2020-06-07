@@ -22,7 +22,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/mini_fab_margin"
-            android:layout_centerInParent="true"
             android:src="@drawable/ic_play"
             android:tint="@color/grey_80"
             app:backgroundTint="@color/grey_20"
@@ -35,8 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/mini_fab_margin"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_stop"
+            android:src="@drawable/ic_save"
             android:tint="@color/grey_80"
             app:backgroundTint="@color/grey_20"
             app:fabSize="mini"
@@ -48,7 +46,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/mini_fab_margin"
-            android:layout_centerInParent="true"
             android:src="@drawable/ic_cancel"
             android:tint="@color/grey_80"
             app:backgroundTint="@color/grey_20"
@@ -65,7 +62,7 @@
             android:layout_marginTop="@dimen/mini_fab_margin"
             android:layout_marginRight="@dimen/med_fab_margin"
             android:layout_marginBottom="@dimen/med_fab_margin"
-            android:src="@drawable/ic_settings"
+            android:src="@drawable/ic_brush"
             app:fabSize="normal" />
     </LinearLayout>
 

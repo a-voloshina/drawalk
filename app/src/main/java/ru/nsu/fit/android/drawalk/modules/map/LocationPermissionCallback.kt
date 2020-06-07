@@ -62,7 +62,7 @@ class LocationPermissionCallback(
     private fun openSettingsScreen() {
         val intent = Intent()
         intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        val uri = Uri.parse("package:" + context.packageName)
+        val uri = Uri.parse("package:${context.packageName}")
         intent.data = uri
         context.startActivity(intent)
     }

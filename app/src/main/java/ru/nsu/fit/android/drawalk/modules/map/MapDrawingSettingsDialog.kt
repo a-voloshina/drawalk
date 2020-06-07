@@ -16,13 +16,29 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.DialogDrawingSettingsBinding
 
-class MapDrawingSettingsDialog(
-    private var currentBackgroundColor: Int,
-    private var currentProgress: Int,
-    private val mapDrawingSettingsListener: MapDrawingSettingsListener
-) : DialogFragment() {
+class MapDrawingSettingsDialog : DialogFragment() {
+    companion object {
+        private const val SET_ARGS_COLOR_MESSAGE_KEY = "color argument for MapSnapshotDialog"
+        private const val SET_ARGS_PROGRESS_MESSAGE_KEY = "progress argument for MapSnapshotDialog"
+
+        fun newInstance(
+            color: Int,
+            progress: Int
+        ): DialogFragment {
+            return MapDrawingSettingsDialog().apply {
+                val arguments = Bundle()
+                arguments.putInt(SET_ARGS_PROGRESS_MESSAGE_KEY, progress)
+                arguments.putInt(SET_ARGS_COLOR_MESSAGE_KEY, color)
+                setArguments(arguments)
+            }
+        }
+    }
+
     private lateinit var binding: DialogDrawingSettingsBinding
     private lateinit var thumbView: View
+    private var currentBackgroundColor: Int = 0
+    private var currentProgress: Int = 0
+    private lateinit var mapDrawingSettingsListener: MapDrawingSettingsListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +71,10 @@ class MapDrawingSettingsDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        currentBackgroundColor = arguments?.getInt(SET_ARGS_COLOR_MESSAGE_KEY)
+            ?: throw Exception("no color arguments received in MapSnapshotDialog")
+        currentProgress = arguments?.getInt(SET_ARGS_PROGRESS_MESSAGE_KEY)
+            ?: throw Exception("no progress arguments received in MapSnapshotDialog")
         binding.toolbar.setNavigationOnClickListener { dismiss() }
         binding.toolbar.setTitle(R.string.dialog_toolbar_title)
         binding.toolbar.inflateMenu(R.menu.menu_map)
@@ -115,5 +135,9 @@ class MapDrawingSettingsDialog(
         thumbView.layout(0, 0, thumbView.measuredWidth, thumbView.measuredHeight)
         thumbView.draw(canvas)
         return BitmapDrawable(resources, bitmap)
+    }
+
+    fun addListener(settingsListener: MapDrawingSettingsListener) = this.apply{
+        mapDrawingSettingsListener = settingsListener
     }
 }

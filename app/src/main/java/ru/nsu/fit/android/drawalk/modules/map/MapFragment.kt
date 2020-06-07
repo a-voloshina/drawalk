@@ -12,9 +12,10 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
-import android.provider.MediaStore
 import android.provider.Settings
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -30,26 +31,31 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import ru.nsu.fit.android.drawalk.R
-import ru.nsu.fit.android.drawalk.model.MapPoint
 import ru.nsu.fit.android.drawalk.model.MapSegment
 import ru.nsu.fit.android.drawalk.modules.base.loading.AsynchronousWorkActivity
 import java.io.File
 import java.io.FileOutputStream
 
-class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, MapDrawingSettingsListener {
+class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
+    MapDrawingSettingsListener {
 
     companion object {
         const val REQUEST_CHECK_SETTINGS = 128
         const val DIALOG_TAG = "show dialog in MapFragment"
+        const val SAVE_DRAWING_MODE_MESSAGE = "save drawing mode"
+        const val SAVE_COLOR_MESSAGE = "save current line color"
+        const val SAVE_WIDTH_MESSAGE = "save current line width"
+        const val SAVE_POINTS_MESSAGE = "save points"
+        const val SAVE_ZOOM_MESSAGE = "save map zoom"
     }
 
-    private lateinit var map: GoogleMap //
+    private lateinit var map: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var noGPSMessage: LinearLayout
     private var currentLineColor: Int = Color.RED
     private var currentLineWidth: Int = 10
 
-    private val pointsList: MutableList<MapPoint> = ArrayList()
+    private var points: ArrayList<MapSegment> = ArrayList()
     private var segment = MapSegment(
         color = currentLineColor,
         width = currentLineWidth.toFloat()
@@ -58,7 +64,9 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
     private val locationManager: LocationManager by lazy {
         myActivity.getSystemService(LOCATION_SERVICE) as LocationManager
     }
+    private val asynchronousWorkActivity by lazy { activity as AsynchronousWorkActivity }
     private var isDrawingModeOn = false
+    private var mapZoomSaved = 15f
 
     private val gpsSwitchStateReceiver = object : BroadcastReceiver() {
         private var firstTimeChange = true
@@ -82,6 +90,17 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
 
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        if (savedInstanceState != null) {
+            onRestoreInstanceState(savedInstanceState)
+        }
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getMap()
@@ -91,7 +110,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
             }
         noGPSMessage = view.findViewById(R.id.no_gps_message)
         view.findViewById<Toolbar>(R.id.map_toolbar).apply {
-            setTitle(R.string.app_name)
+            setTitle(R.string.create_art)
             setTitleTextColor(Color.WHITE)
             inflateMenu(R.menu.menu_map_fragment)
             setOnMenuItemClickListener {
@@ -99,21 +118,43 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
                 return@setOnMenuItemClickListener true
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
         val filter = IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION).apply {
             addAction(Intent.ACTION_PROVIDER_CHANGED)
         }
         myActivity.registerReceiver(gpsSwitchStateReceiver, filter)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        myActivity.unregisterReceiver(gpsSwitchStateReceiver)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapZoomSaved = map.cameraPosition.zoom
+        points.add(segment)
+        outState.putBoolean(SAVE_DRAWING_MODE_MESSAGE, isDrawingModeOn)
+        outState.putInt(SAVE_COLOR_MESSAGE, currentLineColor)
+        outState.putInt(SAVE_WIDTH_MESSAGE, currentLineWidth)
+        outState.putParcelableArrayList(SAVE_POINTS_MESSAGE, points)
+        outState.putFloat(SAVE_ZOOM_MESSAGE, mapZoomSaved)
+    }
+
+    private fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        isDrawingModeOn = savedInstanceState.getBoolean(SAVE_DRAWING_MODE_MESSAGE)
+        currentLineColor = savedInstanceState.getInt(SAVE_COLOR_MESSAGE)
+        currentLineWidth = savedInstanceState.getInt(SAVE_WIDTH_MESSAGE)
+        points =
+            savedInstanceState.getParcelableArrayList<MapSegment>(SAVE_POINTS_MESSAGE) as ArrayList
+        mapZoomSaved = savedInstanceState.getFloat(SAVE_ZOOM_MESSAGE)
+    }
+
     override fun showError(cause: Throwable) {
-        Toast.makeText(activity, cause.message, Toast.LENGTH_LONG).show()
+        showToast(cause.message)
     }
 
     private fun getMap() {
+        asynchronousWorkActivity.startProgressBar()
         val mapFragment = childFragmentManager.findFragmentById(R.id.map_fragment)
         if (mapFragment != null) {
             (mapFragment as SupportMapFragment).getMapAsync(this)
@@ -131,6 +172,10 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
             )
     }
 
+    override fun isDrawingModeOn(): Boolean {
+        return isDrawingModeOn
+    }
+
     override fun turnDrawingModeOn() {
         isDrawingModeOn = true
     }
@@ -140,14 +185,20 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
     }
 
     override fun cancelDrawing() {
-        pointsList.clear()
-        segment.coordinates.clear()
-        map.clear()
+        AlertDialog.Builder(context)
+            .setPositiveButton(R.string.accept) { _, _ ->
+                points.clear()
+                segment.coordinates.clear()
+                map.clear()
+            }
+            .setNegativeButton(R.string.cancel) { _, _ ->
+
+            }
+            .setMessage(R.string.erase_art_description)
+            .show()
     }
 
     override fun stopDrawing() {
-        //points.clear()
-        //turnDrawingModeOff()            //TODO: bind with ui
         finish()
         takeMapSnapshot()
     }
@@ -158,12 +209,16 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
 
     override fun onMapReady(googleMap: GoogleMap?) {
         map = googleMap ?: throw Exception("got null GoogleMap in onMapReady")
+        asynchronousWorkActivity.stopProgressBar()
         val explanationMessage = activity?.getString(R.string.explanation_dialog_message)
         LocationPermissionCallback(activity as Activity, this)
             .requestPermission(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 explanationMessage ?: ""
             )
+        if (points.isNotEmpty()) {
+            drawAll()
+        }
     }
 
     override fun addMarker(position: LatLng, title: String) {
@@ -179,7 +234,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
         map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
-    private fun showToast(text: String) {
+    private fun showToast(text: String?) {
         Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
     }
 
@@ -197,9 +252,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
             showToast("Current location: $location")
         }
         val locationRequest = createLocationRequest()
-        if (locationRequest == null) {
-            showToast("get null locationRequest") //TODO: dialog?
-        } else {
+        if (locationRequest != null) {
             startLocationUpdates(locationRequest)
         }
     }
@@ -219,7 +272,6 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
     override fun onMapDrawingSettingsChanged(color: Int, width: Int) {
         currentLineColor = color
         currentLineWidth = width
-        //options = makeOptions()
     }
 
     private fun createLocationRequest(): LocationRequest? {
@@ -258,7 +310,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
     fun onLocationChanged(location: Location) {
         if (isDrawingModeOn) {
             addPoint(location)
-            drawPolyline()
+            drawSegment(segment)
         }
     }
 
@@ -267,7 +319,8 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
         if (currentLineColor == segment.color && currentLineWidth.toFloat() == segment.width) {
             segment.coordinates.add(point)
         } else {
-            val lastPoint =  if (segment.coordinates.isNotEmpty()){
+            points.add(segment)
+            val lastPoint = if (segment.coordinates.isNotEmpty()) {
                 segment.coordinates[segment.coordinates.lastIndex]
             } else {
                 null
@@ -276,7 +329,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
                 color = currentLineColor,
                 width = currentLineWidth.toFloat()
             ).apply {
-                if(lastPoint != null){
+                if (lastPoint != null) {
                     coordinates.add(lastPoint)
                 }
                 coordinates.add(point)
@@ -284,28 +337,29 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
         }
     }
 
-    private fun drawPolyline(){
+    private fun drawSegment(segment: MapSegment) {
         val coordsCount = segment.coordinates.size
-        if (coordsCount > 1){
+        if (coordsCount > 1) {
             map.addPolyline(
                 PolylineOptions()
-                    .add(segment.coordinates[coordsCount-2])
-                    .add(segment.coordinates[coordsCount-1])
+                    .addAll(segment.coordinates)
                     .color(segment.color)
                     .width(segment.width)
             )
         }
     }
 
+    private fun drawAll() {
+        for (segment in points) {
+            drawSegment(segment)
+        }
+    }
+
     private fun moveToCurrentLocation() {
         fusedLocationProviderClient.lastLocation
             .addOnSuccessListener { location ->
-                if (location != null) {               //FIXME: recheck location somehow
-                    showToast(
-                        "Lat is ${location.latitude} " +
-                                "+ Lng is ${location.longitude}"
-                    )
-                    moveAndZoomCamera(LatLng(location.latitude, location.longitude), 15f)
+                if (location != null) {
+                    moveAndZoomCamera(LatLng(location.latitude, location.longitude), mapZoomSaved)
                 } else {
                     showToast("receive null location")
                 }
@@ -342,12 +396,11 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
     }
 
     private fun takeMapSnapshot() {
-        val asynchronousWorkActivity = myActivity as AsynchronousWorkActivity
         asynchronousWorkActivity.startProgressBar()
         map.snapshot { bitmap ->
             val uri = saveToInternalStorage(bitmap)
             asynchronousWorkActivity.stopProgressBar()
-            openMapSnapshotDialog(uri)
+            openMapSnapshotDialog(uri, bitmap)          //TODO: decide, what to do after closing dialog
         }
     }
 
@@ -362,51 +415,21 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback, Map
         return Uri.parse(file.absolutePath)
     }
 
-    private fun openShareImageDialog(filePath: String) {
-        val file: File = myActivity.getFileStreamPath(filePath)
-        if (filePath != "") {
-            val values = ContentValues(2)
-            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            values.put(MediaStore.Images.Media.DATA, file.absolutePath)
-            val contentUriFile =
-                myActivity.contentResolver.insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    values
-                )
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "image/jpeg"
-            intent.putExtra(Intent.EXTRA_STREAM, contentUriFile)
-            startActivity(Intent.createChooser(intent, "Share Image"))
-        } else {
-            showToast("share image failed")
-        }
-    }
-
-    private fun openMapSnapshotDialog(imageUri: Uri) {
-        MapSnapshotDialog(imageUri).show(childFragmentManager, DIALOG_TAG)
+    private fun openMapSnapshotDialog(imageUri: Uri, imageBitmap: Bitmap) {
+        MapSnapshotDialog.newInstance(imageUri, imageBitmap, points)
+            .show(childFragmentManager, DIALOG_TAG)
     }
 
     private fun openMapDrawingSettingsDialog() {
-        MapDrawingSettingsDialog(
+        (MapDrawingSettingsDialog.newInstance(
             currentLineColor,
-            currentLineWidth,
-            this
-        ).show(childFragmentManager, DIALOG_TAG)
-    }
-
-    private fun makeOptions(): PolylineOptions {
-        return PolylineOptions()
-            .color(currentLineColor)
-            .width(currentLineWidth.toFloat())
-            .geodesic(true)
+            currentLineWidth
+        ) as MapDrawingSettingsDialog)
+            .addListener(this)
+            .show(childFragmentManager, DIALOG_TAG)
     }
 
     private fun finish() {
-        if (pointsList.size > 1) {
-            addMarker(pointsList[0].coordinate, getString(R.string.start))
-            addMarker(pointsList[pointsList.size - 1].coordinate, getString(R.string.finish))
-        }
+        map.isMyLocationEnabled = false
     }
-
 }
-
