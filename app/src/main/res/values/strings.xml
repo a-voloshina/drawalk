@@ -62,7 +62,7 @@
     Включить GPS?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
-    <string name="gps_explanation_message">Для получения данных о местоположении необходимо подключение к GPS.</string>
+    <string name="gps_explanation_message">Для получения данных о местоположении необходимо подключение к GPS и интернету, разрешение на получение доступа к местоположению.</string>
     <string name="turn_on">ВКЛЮЧИТЬ</string>
     <string name="warning_yellow_triangle">warning_yellow_triangle</string>
     <string name="map_snapshot_view">map_snapshot_view</string>
@@ -87,4 +87,7 @@
     <string name="authors">Авторы</string>
     <string name="ivan_molochev">Иван Молочев</string>
     <string name="anastasia_voloshina">Анастасия Волошина</string>
+    <string name="cant_get_current_location">Не могу получить доступ к текущему местоположению :(</string>
+    <string name="cant_get_location_without_gps">Не могу определить местоположение без подключения к GPS :(</string>
+    <string name="need_to_turn_on_gps_and_location">Для визуализации маршрута необходимо включить GPS и разрешить доступ к местоположению</string>
 </resources>

@@ -66,6 +66,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
     }
     private val asynchronousWorkActivity by lazy { activity as AsynchronousWorkActivity }
     private var isDrawingModeOn = false
+    private var isPermissionGranted = false
     private var mapZoomSaved = 15f
 
     private val gpsSwitchStateReceiver = object : BroadcastReceiver() {
@@ -79,7 +80,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
                     if (firstTimeChange) {
                         firstTimeChange = false
                         moveToCurrentLocation()
-                        showToast("GPS turned on first time")
+                        //showToast("GPS turned on first time")
                     }
                     noGPSMessage.visibility = View.GONE
                 } else {
@@ -106,9 +107,14 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
         getMap()
         view.findViewById<TextView>(R.id.open_gps_settings_button)
             .setOnClickListener {
-                openGPSSettingsScreen()
+                if(isPermissionGranted){
+                    openGPSSettingsScreen()
+                } else {
+                    tryToGetLocation()
+                }
             }
         noGPSMessage = view.findViewById(R.id.no_gps_message)
+        setNoGPSMessageVisibility()
         view.findViewById<Toolbar>(R.id.map_toolbar).apply {
             setTitle(R.string.create_art)
             setTitleTextColor(Color.WHITE)
@@ -207,15 +213,14 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
+    override fun isLocationAvailable(): Boolean {
+        return isPermissionGranted
+    }
+
     override fun onMapReady(googleMap: GoogleMap?) {
         map = googleMap ?: throw Exception("got null GoogleMap in onMapReady")
         asynchronousWorkActivity.stopProgressBar()
-        val explanationMessage = activity?.getString(R.string.explanation_dialog_message)
-        LocationPermissionCallback(activity as Activity, this)
-            .requestPermission(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                explanationMessage ?: ""
-            )
+        tryToGetLocation()
         if (points.isNotEmpty()) {
             drawAll()
         }
@@ -234,23 +239,32 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
         map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
     }
 
+    private fun setNoGPSMessageVisibility(){
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val isNetworkEnabled =
+            locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        if (isGpsEnabled || isNetworkEnabled) {
+            noGPSMessage.visibility = View.GONE
+        } else {
+            noGPSMessage.visibility = View.VISIBLE
+        }
+    }
+
     private fun showToast(text: String?) {
         Toast.makeText(activity, text, Toast.LENGTH_SHORT).show()
     }
 
     private fun showSadMessage() {
-        showToast("Can't open map without permission :(")
+        showToast(getString(R.string.cant_get_current_location))
     }
 
     private fun showSadGPSMessage() {
-        showToast("Не могу определить местоположение без подключения к GPS :(")
+        showToast(getString(R.string.cant_get_location_without_gps))
     }
 
     override fun handleSuccessfullyGetPermission() {
+        isPermissionGranted = true
         map.isMyLocationEnabled = true
-        map.setOnMyLocationClickListener { location ->
-            showToast("Current location: $location")
-        }
         val locationRequest = createLocationRequest()
         if (locationRequest != null) {
             startLocationUpdates(locationRequest)
@@ -258,6 +272,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
     }
 
     override fun handleCantGetPermission() {
+        isPermissionGranted = false
         showSadMessage()
     }
 
@@ -360,8 +375,6 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
             .addOnSuccessListener { location ->
                 if (location != null) {
                     moveAndZoomCamera(LatLng(location.latitude, location.longitude), mapZoomSaved)
-                } else {
-                    showToast("receive null location")
                 }
             }
             .addOnFailureListener { exception ->

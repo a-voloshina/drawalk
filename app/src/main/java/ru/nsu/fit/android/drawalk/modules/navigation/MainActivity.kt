@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -73,6 +74,13 @@ class MainActivity : AppCompatActivity() {
 
         navView.menu.setGroupVisible(R.id.authed_drawer, authenticated)
         toolbar.menu.setGroupVisible(R.id.authed_main_menu, authenticated)
+
+        findViewById<FloatingActionButton>(R.id.fab).visibility =
+            if (authenticated) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
 
         navView.removeHeaderView(navView.getHeaderView(0))
         if (currentUser == null) {
@@ -150,7 +158,7 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(getString(R.string.app_name))
             .setView(R.layout.dialog_about)
-            .setPositiveButton(getString(R.string.ok)) {_,_->}
+            .setPositiveButton(getString(R.string.ok)) { _, _ -> }
             .show()
     }
 
