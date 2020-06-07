@@ -17,4 +17,5 @@ abstract class IMapFragment(layoutId: Int) : IViewFragment<IMapPresenter>(layout
     abstract fun cancelDrawing()
     abstract fun stopDrawing()
     abstract fun checkGPSisOn(): Boolean
+    abstract fun isLocationAvailable() : Boolean
 }

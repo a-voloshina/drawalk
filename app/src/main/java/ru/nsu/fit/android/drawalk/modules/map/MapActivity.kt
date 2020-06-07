@@ -39,7 +39,7 @@ class MapActivity : SingleFragmentActivity(),
         ViewAnimation.init(binding.stopFab)
         ViewAnimation.init(binding.cancelFab)
         binding.mapFab.setOnClickListener { fabView ->
-            if (view.checkGPSisOn()) {
+            if (view.checkGPSisOn() && view.isLocationAvailable()) {
                 isFabRotate = ViewAnimation.rotateFab(fabView, !isFabRotate)
                 if (isFabRotate) {
                     ViewAnimation.showIn(binding.playPauseFab)
@@ -53,7 +53,7 @@ class MapActivity : SingleFragmentActivity(),
             } else {
                 Toast.makeText(
                     this,
-                    "Для визуализации маршрута необходимо включить GPS",
+                    getString(R.string.need_to_turn_on_gps_and_location),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -93,7 +93,6 @@ class MapActivity : SingleFragmentActivity(),
     }
 
     private fun setPlayPauseButtonColor(){
-        Toast.makeText(this, "drawing mode = ${view.isDrawingModeOn()}", Toast.LENGTH_SHORT).show()
         if (view.isDrawingModeOn()) {
             binding.playPauseFab.setImageResource(R.drawable.ic_pause)
             binding.playPauseFab.backgroundTintList = pauseColor
