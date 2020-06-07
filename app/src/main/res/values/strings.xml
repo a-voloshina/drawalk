@@ -30,7 +30,7 @@
     <string name="loading_updating_username">Updating username…</string>
     <string name="loading_deleting_app_data">Deleting application user data…</string>
     <string name="loading_deleting_auth">Application user data deleted. Deleting user auth data…</string>
-    <string name="sing_in_error">Sign in error</string>
+    <string name="sing_in_error">Sign in error, code:</string>
     <string name="no_data_placeholder">No data</string>
     <string name="no_arts_text">There is no arts</string>
     <string name="no_users_text">There is no users</string>

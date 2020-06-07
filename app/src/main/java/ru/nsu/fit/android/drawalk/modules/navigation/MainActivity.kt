@@ -121,7 +121,9 @@ class MainActivity : AppCompatActivity() {
             if (resultCode != Activity.RESULT_OK) {
                 val response = IdpResponse.fromResultIntent(data)
                 response?.error?.errorCode?.let {
-                    Toast.makeText(this, getString(R.string.sing_in_error), Toast.LENGTH_LONG).show()
+                    val msg = "${getString(R.string.sing_in_error)} $it " +
+                            "(${response.error?.message ?: "NO MESSAGE"})"
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                 }
             }
         }
