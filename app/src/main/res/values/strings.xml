@@ -88,4 +88,6 @@
     <string name="erase_art_question">Стереть рисунок?</string>
     <string name="erase_art_description">Вы уверены, что хотите сбросить рисунок? Эта операция не может быть отменена.</string>
     <string name="enter_art_name">Введите название арта…</string>
+    <string name="art_saved">GPS арт сохранен!</string>
+    <string name="error">Ошибка</string>
 </resources>

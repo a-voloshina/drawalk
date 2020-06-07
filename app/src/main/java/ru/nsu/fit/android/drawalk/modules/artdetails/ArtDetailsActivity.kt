@@ -29,6 +29,7 @@ import java.util.*
 class ArtDetailsActivity : IArtDetailsActivity(), OnMapReadyCallback {
     companion object {
         const val ART_ID_EXTRA = "ART_ID_EXTRA"
+        private const val ART_PADDING_PX = 50
     }
 
     private lateinit var toolbar: Toolbar
@@ -85,6 +86,7 @@ class ArtDetailsActivity : IArtDetailsActivity(), OnMapReadyCallback {
 
     override fun updateArtData(art: GpsArt, username: String) {
         authorId = art.authorId
+        updateMenuUI()
         this.name.text = art.name
         this.authorName.text = username
         this.created.text = SimpleDateFormat("dd.MM.yyyy hh:mm", Locale.ENGLISH)
@@ -103,8 +105,9 @@ class ArtDetailsActivity : IArtDetailsActivity(), OnMapReadyCallback {
                     .color(segment.color)
                     .width(segment.width))
             }
-            map.moveCamera(CameraUpdateFactory
-                .newLatLngBounds(MapUtils.getBounds(segments), 5))
+            MapUtils.getBounds(segments)?.let {
+                map.moveCamera(CameraUpdateFactory.newLatLngBounds(it, ART_PADDING_PX))
+            }
         }
     }
 
@@ -123,13 +126,10 @@ class ArtDetailsActivity : IArtDetailsActivity(), OnMapReadyCallback {
         return true
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        menu?.let {
-            val currentUserId = FirebaseHolder.AUTH.currentUser?.uid
-            val youAreAuthor = currentUserId != null && authorId == currentUserId
-            it.setGroupVisible(R.id.authed_art_menu, youAreAuthor)
-        }
-        return super.onPrepareOptionsMenu(menu)
+    private fun updateMenuUI() {
+        val currentUserId = FirebaseHolder.AUTH.currentUser?.uid
+        val youAreAuthor = currentUserId != null && authorId == currentUserId
+        toolbar.menu.setGroupVisible(R.id.authed_art_menu, youAreAuthor)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {

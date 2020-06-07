@@ -398,9 +398,8 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
     private fun takeMapSnapshot() {
         asynchronousWorkActivity.startProgressBar()
         map.snapshot { bitmap ->
-            val uri = saveToInternalStorage(bitmap)
             asynchronousWorkActivity.stopProgressBar()
-            openMapSnapshotDialog(uri, bitmap)          //TODO: decide, what to do after closing dialog
+            openMapSnapshotDialog(bitmap)
         }
     }
 
@@ -415,8 +414,8 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
         return Uri.parse(file.absolutePath)
     }
 
-    private fun openMapSnapshotDialog(imageUri: Uri, imageBitmap: Bitmap) {
-        MapSnapshotDialog.newInstance(imageUri, imageBitmap, points)
+    private fun openMapSnapshotDialog(imageBitmap: Bitmap) {
+        MapSnapshotDialog.newInstance(imageBitmap, points)
             .show(childFragmentManager, DIALOG_TAG)
     }
 
@@ -430,6 +429,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
     }
 
     private fun finish() {
+        points.add(segment)
         map.isMyLocationEnabled = false
     }
 }

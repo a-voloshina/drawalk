@@ -1,6 +1,5 @@
 package ru.nsu.fit.android.drawalk.utils
 
-import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import ru.nsu.fit.android.drawalk.model.MapSegment
@@ -8,7 +7,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 object MapUtils {
-    fun getBounds(segments: List<MapSegment>): LatLngBounds {
+    fun getBounds(segments: List<MapSegment>): LatLngBounds? {
         var swLat = 90.0
         var swLng = 180.0
         var neLat = -90.0
@@ -22,9 +21,8 @@ object MapUtils {
             }
         }
         if (swLat > neLat || swLng > neLng) {
-            return LatLngBounds(LatLng(0.0, 0.0), LatLng(0.0, 0.0))
+            return null
         }
-        Log.d("BOUNDS", "$swLat $swLng, $neLat $neLng")
         return LatLngBounds(LatLng(swLat, swLng), LatLng(neLat, neLng))
     }
 }
