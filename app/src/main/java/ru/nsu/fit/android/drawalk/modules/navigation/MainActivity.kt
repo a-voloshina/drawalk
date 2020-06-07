@@ -1,6 +1,7 @@
 package ru.nsu.fit.android.drawalk.modules.navigation
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -23,7 +24,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.squareup.picasso.Picasso
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ActivityMainBinding
-import ru.nsu.fit.android.drawalk.modules.example.ExampleActivity
 import ru.nsu.fit.android.drawalk.modules.map.MapActivity
 import ru.nsu.fit.android.drawalk.modules.profile.MyProfileActivity
 import ru.nsu.fit.android.drawalk.utils.FirebaseHolder
@@ -140,14 +140,18 @@ class MainActivity : AppCompatActivity() {
             true
         }
         R.id.action_about -> {
-            Toast.makeText(this, "Show about", Toast.LENGTH_SHORT).show()
-            true
-        }
-        R.id.action_example -> {
-            startActivity(Intent(this, ExampleActivity::class.java))
+            showAboutDialog()
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun showAboutDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.app_name))
+            .setView(R.layout.dialog_about)
+            .setPositiveButton(getString(R.string.ok)) {_,_->}
+            .show()
     }
 
     override fun onSupportNavigateUp(): Boolean {
