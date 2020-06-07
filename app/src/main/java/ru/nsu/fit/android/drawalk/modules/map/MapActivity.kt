@@ -3,10 +3,10 @@ package ru.nsu.fit.android.drawalk.modules.map
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import ru.nsu.fit.android.drawalk.R
 import ru.nsu.fit.android.drawalk.databinding.ActivityMapBinding
@@ -19,7 +19,12 @@ class MapActivity : SingleFragmentActivity(),
     private lateinit var view: IMapFragment
 
     private var isFabRotate = false
-    private var play = false
+    private val playColor by lazy {
+        ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_20))
+    }
+    private val pauseColor by lazy {
+        ColorStateList.valueOf(ContextCompat.getColor(this, R.color.green))
+    }
 
     override fun createFragment(): Fragment = MapFragment()
 
@@ -56,19 +61,17 @@ class MapActivity : SingleFragmentActivity(),
             }
         }
 
+        setPlayPauseButtonColor()
+
         binding.playPauseFab.setOnClickListener {
-            play = if (play) {
+            if (view.isDrawingModeOn()) {
                 view.turnDrawingModeOff()
                 binding.playPauseFab.setImageResource(R.drawable.ic_play)
-                binding.playPauseFab.backgroundTintList =
-                    ColorStateList.valueOf(Color.parseColor("#cccccc"))
-                false
+                binding.playPauseFab.backgroundTintList = playColor
             } else {
                 view.turnDrawingModeOn()
                 binding.playPauseFab.setImageResource(R.drawable.ic_pause)
-                binding.playPauseFab.backgroundTintList =
-                    ColorStateList.valueOf(Color.parseColor("#1CC50F"))
-                true
+                binding.playPauseFab.backgroundTintList = pauseColor
             }
         }
         binding.cancelFab.setOnClickListener {
@@ -108,5 +111,16 @@ class MapActivity : SingleFragmentActivity(),
 
     override fun stopProgressBar() {
         binding.progressBar.visibility = View.GONE
+    }
+
+    private fun setPlayPauseButtonColor(){
+        Toast.makeText(this, "drawing mode = ${view.isDrawingModeOn()}", Toast.LENGTH_SHORT).show()
+        if (view.isDrawingModeOn()) {
+            binding.playPauseFab.setImageResource(R.drawable.ic_pause)
+            binding.playPauseFab.backgroundTintList = pauseColor
+        } else {
+            binding.playPauseFab.setImageResource(R.drawable.ic_play)
+            binding.playPauseFab.backgroundTintList = playColor
+        }
     }
 }

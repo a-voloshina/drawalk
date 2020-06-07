@@ -11,6 +11,7 @@ abstract class IMapFragment(layoutId: Int) : IViewFragment<IMapPresenter>(layout
     abstract fun moveCamera(position: LatLng)
     abstract fun moveAndZoomCamera(position: LatLng, zoom: Float)
     abstract fun tryToGetLocation()
+    abstract fun isDrawingModeOn() : Boolean
     abstract fun turnDrawingModeOn()
     abstract fun turnDrawingModeOff()
     abstract fun cancelDrawing()

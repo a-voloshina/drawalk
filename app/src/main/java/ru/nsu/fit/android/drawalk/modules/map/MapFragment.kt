@@ -14,7 +14,9 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -41,6 +43,11 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
     companion object {
         const val REQUEST_CHECK_SETTINGS = 128
         const val DIALOG_TAG = "show dialog in MapFragment"
+        const val SAVE_DRAWING_MODE_MESSAGE = "save drawing mode"
+        const val SAVE_COLOR_MESSAGE = "save current line color"
+        const val SAVE_WIDTH_MESSAGE = "save current line width"
+        const val SAVE_POINTS_MESSAGE = "save points"
+        const val SAVE_ZOOM_MESSAGE = "save map zoom"
     }
 
     private lateinit var map: GoogleMap //
@@ -49,7 +56,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
     private var currentLineColor: Int = Color.RED
     private var currentLineWidth: Int = 10
 
-    private val points: MutableList<MapSegment> = ArrayList()
+    private var points: ArrayList<MapSegment> = ArrayList()
     private var segment = MapSegment(
         color = currentLineColor,
         width = currentLineWidth.toFloat()
@@ -60,6 +67,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
     }
     private val asynchronousWorkActivity by lazy { activity as AsynchronousWorkActivity }
     private var isDrawingModeOn = false
+    private var mapZoomSaved = 15f
 
     private val gpsSwitchStateReceiver = object : BroadcastReceiver() {
         private var firstTimeChange = true
@@ -81,6 +89,17 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
             }
         }
 
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        if (savedInstanceState != null) {
+            onRestoreInstanceState(savedInstanceState)
+        }
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -110,11 +129,28 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
         myActivity.registerReceiver(gpsSwitchStateReceiver, filter)
     }
 
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        if (points.isNotEmpty()) {
-            drawAll()
-        }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapZoomSaved = map.cameraPosition.zoom
+        points.add(segment)
+        outState.putBoolean(SAVE_DRAWING_MODE_MESSAGE, isDrawingModeOn)
+        outState.putInt(SAVE_COLOR_MESSAGE, currentLineColor)
+        outState.putInt(SAVE_WIDTH_MESSAGE, currentLineWidth)
+        outState.putParcelableArrayList(SAVE_POINTS_MESSAGE, points)
+        outState.putFloat(SAVE_ZOOM_MESSAGE, mapZoomSaved)
+        showToast("onSaveInstanceState")
+        showToast("get drawing mode = $isDrawingModeOn, color = $currentLineColor, width = $currentLineWidth, zoom = $mapZoomSaved")
+    }
+
+    private fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        isDrawingModeOn = savedInstanceState.getBoolean(SAVE_DRAWING_MODE_MESSAGE)
+        currentLineColor = savedInstanceState.getInt(SAVE_COLOR_MESSAGE)
+        currentLineWidth = savedInstanceState.getInt(SAVE_WIDTH_MESSAGE)
+        points =
+            savedInstanceState.getParcelableArrayList<MapSegment>(SAVE_POINTS_MESSAGE) as ArrayList
+        mapZoomSaved = savedInstanceState.getFloat(SAVE_ZOOM_MESSAGE)
+        showToast("onRestoreInstanceState")
+        showToast("get drawing mode = $isDrawingModeOn, color = $currentLineColor, width = $currentLineWidth, zoom = $mapZoomSaved")
     }
 
     override fun showError(cause: Throwable) {
@@ -140,6 +176,10 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
             )
     }
 
+    override fun isDrawingModeOn(): Boolean {
+        return isDrawingModeOn
+    }
+
     override fun turnDrawingModeOn() {
         isDrawingModeOn = true
     }
@@ -157,7 +197,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
     override fun stopDrawing() {
         //points.clear()
         //turnDrawingModeOff()            //TODO: bind with ui
-        finish()
+        //finish()
         takeMapSnapshot()
     }
 
@@ -174,6 +214,11 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 explanationMessage ?: ""
             )
+        //map.uiSettings.isZoomControlsEnabled = true
+
+        if (points.isNotEmpty()) {
+            drawAll()
+        }
     }
 
     override fun addMarker(position: LatLng, title: String) {
@@ -293,6 +338,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
                 coordinates.add(point)
             }
         }
+        moveCamera(point)       //TODO: Add remove this behavior mode
     }
 
     private fun drawSegment(segment: MapSegment) {
@@ -318,11 +364,7 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
         fusedLocationProviderClient.lastLocation
             .addOnSuccessListener { location ->
                 if (location != null) {               //FIXME: recheck location somehow
-                    showToast(
-                        "Lat is ${location.latitude} " +
-                                "+ Lng is ${location.longitude}"
-                    )
-                    moveAndZoomCamera(LatLng(location.latitude, location.longitude), 15f)
+                    moveAndZoomCamera(LatLng(location.latitude, location.longitude), mapZoomSaved)
                 } else {
                     showToast("receive null location")
                 }
@@ -411,20 +453,19 @@ class MapFragment : IMapFragment(R.layout.fragment_map), OnMapReadyCallback,
             .show(childFragmentManager, DIALOG_TAG)
     }
 
-    private fun finish() {
-        map.isMyLocationEnabled = false
-        if (points.size > 1) {
-            val firstSegment = points[0]
-            val secondSegment = points[points.lastIndex]
-            if (firstSegment.coordinates.isNotEmpty() && secondSegment.coordinates.isNotEmpty()) {
-                addMarker(firstSegment.coordinates[0], getString(R.string.start))
-                addMarker(
-                    secondSegment.coordinates[secondSegment.coordinates.lastIndex],
-                    getString(R.string.finish)
-                )
-            }
-        }
-    }
+//    private fun finish() {
+//        map.isMyLocationEnabled = false
+//        if (points.size > 1) {
+//            val firstSegment = points[0]
+//            val secondSegment = points[points.lastIndex]
+//            if (firstSegment.coordinates.isNotEmpty() && secondSegment.coordinates.isNotEmpty()) {
+//                addMarker(firstSegment.coordinates[0], getString(R.string.start))
+//                addMarker(
+//                    secondSegment.coordinates[secondSegment.coordinates.lastIndex],
+//                    getString(R.string.finish)
+//                )
+//            }
+//        }
+//    }
 
 }
-
