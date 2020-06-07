@@ -1,6 +1,93 @@
 <resources>
-    <string name="app_name">DraWalk Application</string>
-    <string name="cancell_next">Calc, cancell next</string>
+    <string name="app_name">DraWalk</string>
+    <string name="cancel_prev">Calc, cancel prev</string>
     <string name="simple">Calc (simple)</string>
     <string name="calc_placeholder">Calculation result</string>
+    <string name="to_feed">Add art</string>
+    <string name="art_name_placeholder">Name</string>
+    <string name="author_name_placeholder">Author name</string>
+    <string name="art_miniature_description">Art miniature</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_profile_settings">Profile settings</string>
+
+    <string name="arts_feed">Latest arts</string>
+    <string name="users_feed">Users</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_out">Sign out</string>
+    <string name="my_arts">My arts</string>
+    <string name="user_name">User name</string>
+    <string name="user_avatar_description">User avatar</string>
+    <string name="user_email_placeholder">user@email.com</string>
+    <string name="delete_account">Delete account</string>
+    <string name="submit">Submit</string>
+    <string name="cancel">Отменить</string>
+    <string name="loading_placeholder">Loading, please wait…</string>
+    <string name="loading_updating_username">Updating username…</string>
+    <string name="loading_deleting_app_data">Deleting application user data…</string>
+    <string name="loading_deleting_auth">Application user data deleted. Deleting user auth data…</string>
+    <string name="sing_in_error">Sign in error, code:</string>
+    <string name="no_data_placeholder">No data</string>
+    <string name="no_arts_text">There is no arts</string>
+    <string name="no_users_text">There is no users</string>
+    <string name="no_user_arts_text">User have no arts</string>
+    <string name="no_my_arts_text">You don\'t have any arts yet, create a new one!</string>
+    <string name="date_time_placeholder">01.01.2020 00:00</string>
+    <string name="action_rename_art">Rename art</string>
+    <string name="action_delete_art">Delete art</string>
+    <string name="gps_art">GPS Art</string>
+    <string name="action_about">About…</string>
+    <string name="rename_art_loading">Changing art name…</string>
+    <string name="delete_art_loading">Deleting art…</string>
+    <string name="not_sure">No</string>
+    <string name="sure">Yes</string>
+    <string name="art_delete_dialog_title">Art deletion</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="rename_art_dialog_title">Rename art</string>
+    <string name="ok">OK</string>
+    <string name="enter_new_art_name">Enter new art name:</string>
+    <string name="new_art_name_hint">Art name</string>
+    <string name="delete_account_dialog_title">Account deletion</string>
+    <string name="user_activity_label">User info</string>
+    <string name="my_profile_activity_label">Profile settings</string>
+
+    <string name="allow">Разрешить</string>
+    <string name="decline">Отклонить</string>
+    <string name="explanation_dialog_title">Доступ к данным</string>
+    <string name="explanation_dialog_message">Чтобы продолжить необходимо разрешение на получение информации о местоположении.
+        Это разрешение требуется для того,
+        чтобы рисовать маршрут на основе вашей геолокации. Разрешить доступ к данным? </string>
+    <string name="really_need_explanation_dialog_message">Чтобы продолжить необходимо разрешение на получение информации о местоположении.
+        Это разрешение требуется для того,
+        чтобы рисовать маршрут на основе вашей геолокации. Разрешить доступ к данным? </string>
+    <string name="permission_denied">Отказано в разрешении</string>
+    <string name="gps_explanation_dialog_message">Для продолжения необходимо получение данных о местоположении.
+    Включить GPS?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="gps_explanation_message">Для получения данных о местоположении необходимо подключение к GPS.</string>
+    <string name="turn_on">ВКЛЮЧИТЬ</string>
+    <string name="warning_yellow_triangle">warning_yellow_triangle</string>
+    <string name="map_snapshot_view">map_snapshot_view</string>
+    <string name="image_uri">Image uri</string>
+    <string name="save">Сохранить</string>
+    <string name="dialog_toolbar_title">Сохранить результат</string>
+    <string name="share">Поделиться</string>
+    <string name="settings">settings</string>
+    <string name="choose_line_color">Выберите цвет линии</string>
+    <string name="choose_line_width">Выберите толщину линии</string>
+    <string name="choose_color">Выбрать цвет</string>
+    <string name="start">Старт</string>
+    <string name="finish">Финиш</string>
+    <string name="create_art">Создать рисунок</string>
+    <string name="accept">Принять</string>
+    <string name="erase_art_question">Стереть рисунок?</string>
+    <string name="erase_art_description">Вы уверены, что хотите сбросить рисунок? Эта операция не может быть отменена.</string>
+    <string name="enter_art_name">Введите название арта…</string>
+    <string name="art_saved">GPS арт сохранен!</string>
+    <string name="error">Ошибка</string>
 </resources>

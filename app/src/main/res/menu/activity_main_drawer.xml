@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group>
+        <item
+            android:id="@+id/nav_arts"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/arts_feed" />
+        <item
+            android:id="@+id/nav_users"
+            android:icon="@drawable/ic_users"
+            android:title="@string/users_feed" />
+    </group>
+    <group
+        android:id="@+id/authed_drawer"
+        android:visible="false">
+        <item
+            android:id="@+id/nav_my_arts"
+            android:icon="@drawable/ic_my_arts"
+            android:title="@string/my_arts" />
+    </group>
+</menu>

@@ -1,4 +1,4 @@
-package ru.nsu.fit.android.drawalk.common
+package ru.nsu.fit.android.drawalk.usecase
 
 import android.util.Log
 import kotlinx.coroutines.*

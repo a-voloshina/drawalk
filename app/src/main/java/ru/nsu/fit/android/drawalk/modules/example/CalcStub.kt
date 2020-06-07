@@ -1,7 +1,7 @@
 package ru.nsu.fit.android.drawalk.modules.example
 
 import kotlinx.coroutines.delay
-import ru.nsu.fit.android.drawalk.common.UseCase
+import ru.nsu.fit.android.drawalk.usecase.UseCase
 
 class CalcStub: UseCase<String, String>("") {
     override suspend fun executeOnBackground(): String {

@@ -1,9 +1,9 @@
 package ru.nsu.fit.android.drawalk.modules.example
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import ru.nsu.ccfit.molochev.android.rssample.modules.base.SingleFragmentActivity
 import ru.nsu.fit.android.drawalk.databinding.ActivityExampleBinding
+import ru.nsu.fit.android.drawalk.modules.base.activity.SingleFragmentActivity
+import ru.nsu.fit.android.drawalk.utils.FirebaseHolder
 
 class ExampleActivity: SingleFragmentActivity() {
     private var counter = 0
@@ -26,6 +26,12 @@ class ExampleActivity: SingleFragmentActivity() {
         }
         binding.repeateble.setOnClickListener {
             presenter.calcWithoutCancel(counter++.toString())
+        }
+        binding.feed.setOnClickListener {
+            FirebaseHolder.addStubArt()
+        }
+        binding.delete.setOnClickListener {
+            FirebaseHolder.clearAll()
         }
     }
 }
